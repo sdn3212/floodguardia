@@ -1,12 +1,10 @@
 
 import { useEffect, useRef, useState } from "react";
-import mapboxgl from "mapbox-gl";
-import "mapbox-gl/dist/mapbox-gl.css";
+import maplibregl from "maplibre-gl";
+import "maplibre-gl/dist/maplibre-gl.css";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { API_KEYS, DEFAULT_MAP_LOCATION, DEFAULT_MAP_ZOOM, MOCK_FLOOD_LOCATIONS } from "@/config/constants";
 import { MapLocation } from "@/types";
-
-mapboxgl.accessToken = API_KEYS.MAPBOX;
 
 interface FloodMapProps {
   className?: string;
@@ -14,23 +12,23 @@ interface FloodMapProps {
 
 const FloodMap = ({ className }: FloodMapProps) => {
   const mapContainer = useRef<HTMLDivElement>(null);
-  const map = useRef<mapboxgl.Map | null>(null);
+  const map = useRef<maplibregl.Map | null>(null);
   const [locations] = useState<MapLocation[]>(MOCK_FLOOD_LOCATIONS);
   
   useEffect(() => {
     if (!mapContainer.current) return;
     
-    // Initialize map
-    map.current = new mapboxgl.Map({
+    // Initialize map using MapTiler
+    map.current = new maplibregl.Map({
       container: mapContainer.current,
-      style: "mapbox://styles/mapbox/streets-v12",
+      style: `https://api.maptiler.com/maps/streets/style.json?key=${API_KEYS.MAPTILER}`,
       center: DEFAULT_MAP_LOCATION,
       zoom: DEFAULT_MAP_ZOOM
     });
     
     // Add navigation controls
     map.current.addControl(
-      new mapboxgl.NavigationControl(),
+      new maplibregl.NavigationControl(),
       "top-right"
     );
     
@@ -66,14 +64,14 @@ const FloodMap = ({ className }: FloodMapProps) => {
         }
         
         // Add popup
-        const popup = new mapboxgl.Popup({ offset: 25 })
+        const popup = new maplibregl.Popup({ offset: 25 })
           .setHTML(`
             <strong>${location.name}</strong>
             <p>Risk Level: <span style="color: ${getRiskColor(location.riskLevel)}; font-weight: bold; text-transform: uppercase;">${location.riskLevel}</span></p>
           `);
         
         // Add marker to map
-        new mapboxgl.Marker(el)
+        new maplibregl.Marker(el)
           .setLngLat(location.coordinates)
           .setPopup(popup)
           .addTo(map.current);

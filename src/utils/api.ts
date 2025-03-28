@@ -52,15 +52,11 @@ export const getFloodAlerts = async (count: number = 5): Promise<FloodAlert[]> =
 };
 
 export const getFloodPrediction = async (): Promise<{riskLevel: RiskLevel, description: string}> => {
-  // In a real application, this would call the ML model or Gemini API
-  // Simulate API call delay
-  await new Promise(resolve => setTimeout(resolve, 1000));
-  
-  const currentData = generateMockSensorData(1)[0];
+  // Get current sensor data
+  const currentData = await getCurrentSensorData();
   
   try {
-    // Mock API call to Gemini - This would be an actual API call in production
-    /*
+    // Call Gemini API for prediction
     const response = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent', {
       method: 'POST',
       headers: {
@@ -70,19 +66,35 @@ export const getFloodPrediction = async (): Promise<{riskLevel: RiskLevel, descr
       body: JSON.stringify({
         contents: [{
           parts: [{
-            text: `Based on the following sensor data, what is the flood risk? Water level: ${currentData.waterLevel}m, Rainfall: ${currentData.rainfall}mm/h, Temperature: ${currentData.temperature}°C, Humidity: ${currentData.humidity}%, Soil Moisture: ${currentData.soilMoisture}%. Respond with only one of these risk levels: "low", "medium", "high", or "critical" followed by a brief explanation.`
+            text: `Based on the following sensor data, what is the flood risk? Water level: ${currentData.waterLevel}m, Rainfall: ${currentData.rainfall}mm/h, Temperature: ${currentData.temperature}°C, Humidity: ${currentData.humidity}%, Soil Moisture: ${currentData.soilMoisture}%. Respond with only one of these risk levels: "low", "medium", "high", or "critical" followed by a brief explanation separated by a pipe character (|).`
           }]
         }]
       })
     });
     
+    if (!response.ok) {
+      console.error('Gemini API error:', await response.text());
+      return {
+        riskLevel: currentData.predictionRisk,
+        description: `Based on the current water level of ${currentData.waterLevel}m and rainfall of ${currentData.rainfall}mm/h, combined with soil saturation at ${currentData.soilMoisture}%, the current flood risk is ${currentData.predictionRisk.toUpperCase()}.`
+      };
+    }
+    
     const data = await response.json();
-    const predictionText = data.candidates[0].content.parts[0].text;
-    */
+    const predictionText = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+    
+    // Parse the response - format should be "risk_level|explanation"
+    const [predictedRisk, explanation] = predictionText.split('|').map(part => part.trim());
+    
+    // Validate and normalize risk level
+    let riskLevel: RiskLevel = 'low';
+    if (['low', 'medium', 'high', 'critical'].includes(predictedRisk.toLowerCase())) {
+      riskLevel = predictedRisk.toLowerCase() as RiskLevel;
+    }
     
     return {
-      riskLevel: currentData.predictionRisk,
-      description: `Based on the current water level of ${currentData.waterLevel}m and rainfall of ${currentData.rainfall}mm/h, combined with soil saturation at ${currentData.soilMoisture}%, the current flood risk is ${currentData.predictionRisk.toUpperCase()}.`
+      riskLevel,
+      description: explanation || `Based on sensor data analysis, the current flood risk is ${riskLevel.toUpperCase()}.`
     };
   } catch (error) {
     console.error('Error getting flood prediction:', error);
