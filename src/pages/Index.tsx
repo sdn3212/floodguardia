@@ -27,7 +27,9 @@ const Index = () => {
             <div className="lg:col-span-1">
               <RiskIndicator />
             </div>
-            <WeatherWidget className="lg:col-span-2" />
+            <div className="lg:col-span-2">
+              <WeatherWidget />
+            </div>
           </div>
           
           <div className="space-y-4">
