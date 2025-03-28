@@ -1,13 +1,42 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+
+import { useEffect } from "react";
+import Layout from "@/components/Layout";
+import RiskIndicator from "@/components/RiskIndicator";
+import SensorReadings from "@/components/SensorReadings";
+import WeatherWidget from "@/components/WeatherWidget";
+import AlertsTimeline from "@/components/AlertsTimeline";
+import HistoricalDataChart from "@/components/HistoricalDataChart";
+import FloodMap from "@/components/FloodMap";
 
 const Index = () => {
+  useEffect(() => {
+    document.title = "FloodGuardia - Dashboard";
+  }, []);
+  
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold mb-4">Welcome to Your Blank App</h1>
-        <p className="text-xl text-gray-600">Start building your amazing project here!</p>
+    <Layout>
+      <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
+        <div className="md:col-span-8 space-y-6">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <RiskIndicator className="lg:col-span-1" />
+            <WeatherWidget className="lg:col-span-2" />
+          </div>
+          
+          <div className="space-y-4">
+            <h2 className="text-xl font-semibold">Current Sensor Readings</h2>
+            <SensorReadings />
+          </div>
+          
+          <HistoricalDataChart />
+          
+          <FloodMap />
+        </div>
+        
+        <div className="md:col-span-4">
+          <AlertsTimeline />
+        </div>
       </div>
-    </div>
+    </Layout>
   );
 };
 
