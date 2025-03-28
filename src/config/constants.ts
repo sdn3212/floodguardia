@@ -25,7 +25,8 @@ export const RISK_LEVEL_DESCRIPTIONS: Record<RiskLevel, string> = {
 export const API_KEYS = {
   GEMINI: "AIzaSyDKrdqNEPxy7660KlVTTNOyqp71p9stbzE",
   OPENWEATHERMAP: "22eefce6473b2558318670f52c295b67",
-  MAPTILER: "LJwsgPqESAjRNnYh1cjw"
+  MAPTILER: "LJwsgPqESAjRNnYh1cjw",
+  METEOBLUE: "1mbHMgZxRuhQDE5n"
 };
 
 export const DEFAULT_MAP_LOCATION: [number, number] = [-73.935242, 40.730610]; // NYC

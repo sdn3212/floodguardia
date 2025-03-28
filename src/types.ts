@@ -22,6 +22,15 @@ export interface WeatherData {
   rainfall: number;
 }
 
+export interface ForecastData {
+  date: string;
+  condition: string;
+  tempHigh: number;
+  tempLow: number;
+  precipitation: number;
+  humidity: number;
+}
+
 export interface FloodAlert {
   id: string;
   timestamp: string;

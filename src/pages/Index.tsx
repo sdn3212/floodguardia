@@ -7,6 +7,9 @@ import WeatherWidget from "@/components/WeatherWidget";
 import AlertsTimeline from "@/components/AlertsTimeline";
 import HistoricalDataChart from "@/components/HistoricalDataChart";
 import FloodMap from "@/components/FloodMap";
+import ForecastWidget from "@/components/ForecastWidget";
+import EmergencyContactsWidget from "@/components/EmergencyContactsWidget";
+import SafetyTipsWidget from "@/components/SafetyTipsWidget";
 
 const Index = () => {
   useEffect(() => {
@@ -32,8 +35,13 @@ const Index = () => {
           <FloodMap />
         </div>
         
-        <div className="md:col-span-4">
+        <div className="md:col-span-4 space-y-6">
           <AlertsTimeline />
+          <ForecastWidget />
+          <div className="grid grid-cols-1 gap-6">
+            <EmergencyContactsWidget />
+            <SafetyTipsWidget />
+          </div>
         </div>
       </div>
     </Layout>

@@ -1,93 +1,93 @@
 
 import { useEffect, useState } from "react";
-import { RiskLevel } from "@/types";
-import { RISK_LEVEL_COLORS, RISK_LEVEL_DESCRIPTIONS, RISK_LEVEL_TEXT_COLORS } from "@/config/constants";
-import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
 import { getFloodPrediction } from "@/utils/api";
-import { Waves } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Shield, ShieldAlert, ShieldCheck, ShieldX } from "lucide-react";
+import { RISK_LEVEL_COLORS, RISK_LEVEL_DESCRIPTIONS, RISK_LEVEL_TEXT_COLORS } from "@/config/constants";
+import { RiskLevel } from "@/types";
 
 interface RiskIndicatorProps {
   className?: string;
 }
 
 const RiskIndicator = ({ className }: RiskIndicatorProps) => {
-  const [riskLevel, setRiskLevel] = useState<RiskLevel>('low');
-  const [description, setDescription] = useState('');
+  const [riskLevel, setRiskLevel] = useState<RiskLevel>("low");
+  const [description, setDescription] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   
   useEffect(() => {
-    const fetchPrediction = async () => {
+    const fetchRiskData = async () => {
       setIsLoading(true);
       try {
-        const prediction = await getFloodPrediction();
-        setRiskLevel(prediction.riskLevel);
-        setDescription(prediction.description);
+        const { riskLevel, description } = await getFloodPrediction();
+        setRiskLevel(riskLevel);
+        setDescription(description);
       } catch (error) {
-        console.error('Error fetching prediction:', error);
+        console.error("Error fetching risk data:", error);
       } finally {
         setIsLoading(false);
       }
     };
     
-    fetchPrediction();
+    fetchRiskData();
     
     // Refresh every 5 minutes
-    const interval = setInterval(fetchPrediction, 5 * 60 * 1000);
+    const interval = setInterval(fetchRiskData, 5 * 60 * 1000);
     return () => clearInterval(interval);
   }, []);
   
-  return (
-    <div className={cn("rounded-lg overflow-hidden border", className)}>
-      <div className="p-4 bg-white">
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-semibold">Current Flood Risk</h2>
-          {isLoading && (
-            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-500"></div>
-          )}
-        </div>
-        
-        <div 
-          className={cn(
-            "relative flex items-center justify-center p-6 rounded-lg bg-opacity-10 transition-colors",
-            RISK_LEVEL_COLORS[riskLevel],
-            "bg-opacity-10"
-          )}
-        >
-          <div className="absolute inset-0 flex justify-center items-center overflow-hidden">
-            <div className={cn(
-              "absolute h-24 w-24 rounded-full",
-              RISK_LEVEL_COLORS[riskLevel],
-              "opacity-10"
-            )}></div>
-            <div className={cn(
-              "absolute h-36 w-36 rounded-full animate-ripple",
-              RISK_LEVEL_COLORS[riskLevel],
-              "opacity-5"
-            )}></div>
-          </div>
-          
-          <div className="text-center relative z-10">
-            <div className="flex items-center justify-center mb-3">
-              <Waves className={cn("h-8 w-8 mr-2", RISK_LEVEL_TEXT_COLORS[riskLevel])} />
-              <span className={cn(
-                "text-3xl font-bold uppercase", 
-                RISK_LEVEL_TEXT_COLORS[riskLevel]
-              )}>
-                {riskLevel}
-              </span>
+  const getRiskIcon = () => {
+    switch (riskLevel) {
+      case "low":
+        return <ShieldCheck className="h-12 w-12 text-flood-low" />;
+      case "medium":
+        return <Shield className="h-12 w-12 text-flood-medium" />;
+      case "high":
+        return <ShieldAlert className="h-12 w-12 text-flood-high" />;
+      case "critical":
+        return <ShieldX className="h-12 w-12 text-flood-critical" />;
+      default:
+        return <ShieldCheck className="h-12 w-12 text-flood-low" />;
+    }
+  };
+  
+  if (isLoading) {
+    return (
+      <Card className={`${className} animate-pulse`}>
+        <CardHeader className="pb-2">
+          <div className="h-6 bg-gray-200 rounded w-1/3"></div>
+        </CardHeader>
+        <CardContent>
+          <div className="flex items-center space-x-4">
+            <div className="h-12 w-12 rounded-full bg-gray-200"></div>
+            <div>
+              <div className="h-6 bg-gray-200 rounded w-20 mb-2"></div>
+              <div className="h-4 bg-gray-200 rounded w-full"></div>
+              <div className="h-4 bg-gray-200 rounded w-2/3 mt-1"></div>
             </div>
-            <p className="text-gray-600 mb-4">{RISK_LEVEL_DESCRIPTIONS[riskLevel]}</p>
-            <p className="text-sm text-gray-500">{description}</p>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+  
+  return (
+    <Card className={className}>
+      <CardHeader className="pb-2">
+        <CardTitle>Flood Risk Level</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="flex items-center space-x-4">
+          <div className="flex-shrink-0">{getRiskIcon()}</div>
+          <div>
+            <div className={`text-lg font-bold uppercase mb-1 ${RISK_LEVEL_TEXT_COLORS[riskLevel]}`}>
+              {riskLevel}
+            </div>
+            <p className="text-sm text-gray-600">{description || RISK_LEVEL_DESCRIPTIONS[riskLevel]}</p>
           </div>
         </div>
-        
-        <div className="mt-4 flex gap-2">
-          <Button variant="secondary" className="w-full">View Details</Button>
-          <Button className="w-full">Alert Settings</Button>
-        </div>
-      </div>
-    </div>
+      </CardContent>
+    </Card>
   );
 };
 

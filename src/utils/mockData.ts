@@ -1,153 +1,179 @@
 
-import { FloodAlert, RiskLevel, SensorData, WeatherData } from "@/types";
+import { addDays, format, subDays } from "date-fns";
+import { FloodAlert, ForecastData, RiskLevel, SensorData, WeatherData } from "@/types";
 import { SENSORS_MOCK_DATA } from "@/config/constants";
 
-const generateRandomValue = (min: number, max: number): number => {
+// Helper function to generate random values within a range
+export const randomInRange = (min: number, max: number): number => {
   return Math.round((Math.random() * (max - min) + min) * 10) / 10;
 };
 
-const getRiskLevelBasedOnData = (waterLevel: number, rainfall: number, soilMoisture: number): RiskLevel => {
-  // Simple algorithm for risk assessment
-  const waterLevelNormalized = waterLevel / SENSORS_MOCK_DATA.waterLevel.max;
-  const rainfallNormalized = rainfall / SENSORS_MOCK_DATA.rainfall.max;
-  const soilMoistureNormalized = soilMoisture / SENSORS_MOCK_DATA.soilMoisture.max;
-  
-  const combinedRisk = waterLevelNormalized * 0.4 + rainfallNormalized * 0.4 + soilMoistureNormalized * 0.2;
-  
-  if (combinedRisk > 0.75) return 'critical';
-  if (combinedRisk > 0.5) return 'high';
-  if (combinedRisk > 0.25) return 'medium';
-  return 'low';
+// Helper to generate random dates
+export const randomDate = (start: Date, end: Date): Date => {
+  return new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime()));
 };
 
-export const generateMockSensorData = (count: number = 1): SensorData[] => {
+// Generate mock sensor data
+export const generateMockSensorData = (count: number): SensorData[] => {
   const data: SensorData[] = [];
-  const now = new Date();
   
   for (let i = 0; i < count; i++) {
-    const timestamp = new Date(now.getTime() - i * 3600000).toISOString(); // Go back in time
-    const waterLevel = generateRandomValue(SENSORS_MOCK_DATA.waterLevel.min, SENSORS_MOCK_DATA.waterLevel.max);
-    const rainfall = generateRandomValue(SENSORS_MOCK_DATA.rainfall.min, SENSORS_MOCK_DATA.rainfall.max);
-    const temperature = generateRandomValue(SENSORS_MOCK_DATA.temperature.min, SENSORS_MOCK_DATA.temperature.max);
-    const humidity = generateRandomValue(SENSORS_MOCK_DATA.humidity.min, SENSORS_MOCK_DATA.humidity.max);
-    const soilMoisture = generateRandomValue(SENSORS_MOCK_DATA.soilMoisture.min, SENSORS_MOCK_DATA.soilMoisture.max);
+    const waterLevel = randomInRange(SENSORS_MOCK_DATA.waterLevel.min, SENSORS_MOCK_DATA.waterLevel.max);
+    const rainfall = randomInRange(SENSORS_MOCK_DATA.rainfall.min, SENSORS_MOCK_DATA.rainfall.max);
+    const temperature = randomInRange(SENSORS_MOCK_DATA.temperature.min, SENSORS_MOCK_DATA.temperature.max);
+    const humidity = randomInRange(SENSORS_MOCK_DATA.humidity.min, SENSORS_MOCK_DATA.humidity.max);
+    const soilMoisture = randomInRange(SENSORS_MOCK_DATA.soilMoisture.min, SENSORS_MOCK_DATA.soilMoisture.max);
+    
+    // Determine risk level based on sensor values
+    let risk: RiskLevel = 'low';
+    if (waterLevel > 7 || rainfall > 30) {
+      risk = 'critical';
+    } else if (waterLevel > 5 || rainfall > 20) {
+      risk = 'high';
+    } else if (waterLevel > 3 || rainfall > 10) {
+      risk = 'medium';
+    }
     
     data.push({
-      id: `sensor-${i}`,
-      timestamp,
+      id: `sensor-${Date.now()}-${i}`,
+      timestamp: new Date().toISOString(),
       waterLevel,
       rainfall,
       temperature,
       humidity,
       soilMoisture,
-      predictionRisk: getRiskLevelBasedOnData(waterLevel, rainfall, soilMoisture)
+      predictionRisk: risk
     });
   }
   
   return data;
 };
 
-export const generateMockWeatherData = (): WeatherData => {
-  const weather: WeatherData = {
-    location: 'New York, NY',
-    temperature: generateRandomValue(SENSORS_MOCK_DATA.temperature.min, SENSORS_MOCK_DATA.temperature.max),
-    description: ['Cloudy', 'Rain', 'Light Rain', 'Heavy Rain', 'Thunderstorm', 'Partly Cloudy'][Math.floor(Math.random() * 6)],
-    humidity: generateRandomValue(SENSORS_MOCK_DATA.humidity.min, SENSORS_MOCK_DATA.humidity.max),
-    windSpeed: generateRandomValue(0, 30),
-    icon: ['01d', '02d', '03d', '04d', '09d', '10d', '11d', '13d'][Math.floor(Math.random() * 8)],
-    rainfall: generateRandomValue(SENSORS_MOCK_DATA.rainfall.min, SENSORS_MOCK_DATA.rainfall.max)
-  };
+// Generate mock historical data
+export const generateHistoricalData = (days: number): SensorData[] => {
+  const data: SensorData[] = [];
+  const now = new Date();
+  const startDate = subDays(now, days);
   
-  return weather;
+  for (let i = 0; i <= days; i++) {
+    const date = addDays(startDate, i);
+    
+    // Generate multiple readings per day
+    for (let j = 0; j < 4; j++) {
+      const hour = j * 6; // Readings every 6 hours
+      date.setHours(hour, 0, 0, 0);
+      
+      const waterLevel = randomInRange(SENSORS_MOCK_DATA.waterLevel.min, SENSORS_MOCK_DATA.waterLevel.max / 2); // Less extreme values for historical data
+      const rainfall = randomInRange(SENSORS_MOCK_DATA.rainfall.min, SENSORS_MOCK_DATA.rainfall.max / 2);
+      const temperature = randomInRange(SENSORS_MOCK_DATA.temperature.min, SENSORS_MOCK_DATA.temperature.max);
+      const humidity = randomInRange(SENSORS_MOCK_DATA.humidity.min, SENSORS_MOCK_DATA.humidity.max);
+      const soilMoisture = randomInRange(SENSORS_MOCK_DATA.soilMoisture.min, SENSORS_MOCK_DATA.soilMoisture.max);
+      
+      // Determine risk level based on sensor values
+      let risk: RiskLevel = 'low';
+      if (waterLevel > 7 || rainfall > 30) {
+        risk = 'critical';
+      } else if (waterLevel > 5 || rainfall > 20) {
+        risk = 'high';
+      } else if (waterLevel > 3 || rainfall > 10) {
+        risk = 'medium';
+      }
+      
+      data.push({
+        id: `sensor-${date.getTime()}-${j}`,
+        timestamp: date.toISOString(),
+        waterLevel,
+        rainfall,
+        temperature,
+        humidity,
+        soilMoisture,
+        predictionRisk: risk
+      });
+    }
+  }
+  
+  return data.sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
 };
 
-export const generateMockAlerts = (count: number = 5): FloodAlert[] => {
+// Generate mock weather data
+export const generateMockWeatherData = (): WeatherData => {
+  const temp = randomInRange(0, 35);
+  const conditions = ['clear sky', 'few clouds', 'scattered clouds', 'broken clouds', 'shower rain', 'rain', 'thunderstorm', 'mist'];
+  const icons = ['01d', '02d', '03d', '04d', '09d', '10d', '11d', '50d'];
+  
+  return {
+    location: 'New York',
+    temperature: temp,
+    description: conditions[Math.floor(Math.random() * conditions.length)],
+    humidity: randomInRange(30, 95),
+    windSpeed: randomInRange(0, 20),
+    icon: icons[Math.floor(Math.random() * icons.length)],
+    rainfall: temp > 25 ? 0 : randomInRange(0, 15)
+  };
+};
+
+// Generate mock forecast data
+export const generateMockForecastData = (days: number): ForecastData[] => {
+  const data: ForecastData[] = [];
+  const now = new Date();
+  
+  const conditions = ['Sunny', 'Partly Cloudy', 'Cloudy', 'Rain', 'Showers', 'Drizzle'];
+  
+  for (let i = 1; i <= days; i++) {
+    const date = addDays(now, i);
+    const formattedDate = format(date, 'EEE, MMM d');
+    
+    data.push({
+      date: formattedDate,
+      condition: conditions[Math.floor(Math.random() * conditions.length)],
+      tempHigh: randomInRange(18, 32),
+      tempLow: randomInRange(10, 18),
+      precipitation: randomInRange(0, 20),
+      humidity: randomInRange(40, 90)
+    });
+  }
+  
+  return data;
+};
+
+// Generate mock flood alerts
+export const generateMockAlerts = (count: number): FloodAlert[] => {
   const alerts: FloodAlert[] = [];
   const now = new Date();
   const riskLevels: RiskLevel[] = ['low', 'medium', 'high', 'critical'];
-  const locations = ['Downtown', 'Riverside Park', 'Central District', 'East Side', 'West End'];
+  const locations = ['Downtown', 'Riverside', 'Midtown', 'Harbor District', 'North End'];
   
   for (let i = 0; i < count; i++) {
-    const riskLevel = riskLevels[Math.floor(Math.random() * (count === 5 ? 4 : (i % 4)))];
-    const location = locations[i % locations.length];
-    const timestamp = new Date(now.getTime() - i * 3600000 * 2).toISOString();
+    const riskLevel = riskLevels[Math.floor(Math.random() * riskLevels.length)];
+    const location = locations[Math.floor(Math.random() * locations.length)];
+    const date = randomDate(subDays(now, 2), now);
     
     let message = '';
     switch (riskLevel) {
       case 'low':
-        message = `Low flood risk detected in ${location}. Regular monitoring in place.`;
+        message = `Minor water level increase detected in ${location}. No action required.`;
         break;
       case 'medium':
-        message = `Medium flood risk alert for ${location}. Stay informed about changing conditions.`;
+        message = `Rising water levels in ${location}. Monitor local conditions.`;
         break;
       case 'high':
-        message = `High flood risk warning for ${location}. Prepare for possible evacuation.`;
+        message = `Significant flood risk in ${location}. Prepare for possible evacuation.`;
         break;
       case 'critical':
-        message = `CRITICAL FLOOD ALERT for ${location}. Immediate evacuation recommended.`;
+        message = `IMMEDIATE ACTION REQUIRED: Severe flooding expected in ${location}. Evacuate to higher ground.`;
         break;
     }
     
     alerts.push({
-      id: `alert-${i}`,
-      timestamp,
+      id: `alert-${date.getTime()}-${i}`,
+      timestamp: date.toISOString(),
       riskLevel,
       message,
       location,
-      isRead: Math.random() > 0.5
+      isRead: Math.random() > 0.3 // 70% chance of being read
     });
   }
   
-  return alerts;
-};
-
-export const generateHistoricalData = (days: number = 30): SensorData[] => {
-  const data: SensorData[] = [];
-  const now = new Date();
-  
-  for (let i = 0; i < days; i++) {
-    const date = new Date(now.getTime() - i * 24 * 3600000);
-    
-    // Generate more realistic patterns over time
-    const dayOfYear = Math.floor((date.getTime() - new Date(date.getFullYear(), 0, 0).getTime()) / (24 * 60 * 60 * 1000));
-    const seasonalFactor = Math.sin((dayOfYear / 365) * Math.PI * 2) * 0.3 + 0.5; // Seasonal pattern
-    
-    const waterLevel = generateRandomValue(
-      SENSORS_MOCK_DATA.waterLevel.min, 
-      SENSORS_MOCK_DATA.waterLevel.max * seasonalFactor
-    );
-    
-    const rainfall = generateRandomValue(
-      SENSORS_MOCK_DATA.rainfall.min,
-      SENSORS_MOCK_DATA.rainfall.max * seasonalFactor
-    );
-    
-    const temperature = generateRandomValue(
-      SENSORS_MOCK_DATA.temperature.min + (10 * seasonalFactor),
-      SENSORS_MOCK_DATA.temperature.max * seasonalFactor
-    );
-    
-    const humidity = generateRandomValue(
-      SENSORS_MOCK_DATA.humidity.min + (20 * seasonalFactor),
-      SENSORS_MOCK_DATA.humidity.max * 0.8
-    );
-    
-    const soilMoisture = generateRandomValue(
-      SENSORS_MOCK_DATA.soilMoisture.min + (10 * seasonalFactor),
-      SENSORS_MOCK_DATA.soilMoisture.max * seasonalFactor
-    );
-    
-    data.push({
-      id: `historical-${i}`,
-      timestamp: date.toISOString(),
-      waterLevel,
-      rainfall,
-      temperature,
-      humidity,
-      soilMoisture,
-      predictionRisk: getRiskLevelBasedOnData(waterLevel, rainfall, soilMoisture)
-    });
-  }
-  
-  return data.reverse(); // Most recent first
+  // Sort by date descending (newest first)
+  return alerts.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
 };

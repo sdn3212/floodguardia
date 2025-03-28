@@ -77,7 +77,7 @@ const FloodMap = ({ className }: FloodMapProps) => {
           .addTo(map.current);
       });
       
-      // Add a blue layer for water
+      // Add a blue layer for water - fixing the GeoJSON format to include properties
       map.current.addLayer({
         id: "water-layer",
         type: "fill",
@@ -96,7 +96,8 @@ const FloodMap = ({ className }: FloodMapProps) => {
                   [-73.945242, 40.740610]
                 ]
               ]
-            }
+            },
+            properties: {} // Adding the required properties field
           }
         },
         paint: {

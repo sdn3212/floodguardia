@@ -1,7 +1,7 @@
 
-import { FloodAlert, RiskLevel, SensorData, WeatherData } from "@/types";
+import { FloodAlert, ForecastData, RiskLevel, SensorData, WeatherData } from "@/types";
 import { API_KEYS } from "@/config/constants";
-import { generateHistoricalData, generateMockAlerts, generateMockSensorData, generateMockWeatherData } from "./mockData";
+import { generateHistoricalData, generateMockAlerts, generateMockForecastData, generateMockSensorData, generateMockWeatherData } from "./mockData";
 
 // Mock API functions that would normally connect to a backend
 
@@ -42,6 +42,45 @@ export const getCurrentWeather = async (location: string = 'New York,US'): Promi
   } catch (error) {
     console.error('Error fetching weather data:', error);
     return generateMockWeatherData(); // Fallback to mock data
+  }
+};
+
+export const getForecastData = async (location: string = 'New York,US'): Promise<ForecastData[]> => {
+  try {
+    // Attempt to fetch from meteoblue API (this is mocked for now as the API requires coordinates)
+    // In a real implementation, you would convert location to lat/lon coordinates first
+    
+    // For demo purposes, we're falling back to mock data
+    // But here's how you would approach the actual API call:
+    /*
+    const response = await fetch(
+      `https://my.meteoblue.com/packages/basic-1h?apikey=${API_KEYS.METEOBLUE}&lat=40.7128&lon=-74.0060&format=json`
+    );
+    
+    if (!response.ok) {
+      throw new Error('Failed to fetch forecast data');
+    }
+    
+    const data = await response.json();
+    
+    // Process and transform the data
+    const forecast = data.forecast.slice(0, 3).map((day: any) => ({
+      date: new Date(day.time * 1000).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }),
+      condition: day.description,
+      tempHigh: Math.round(day.temperature_max),
+      tempLow: Math.round(day.temperature_min),
+      precipitation: day.precipitation_amount,
+      humidity: day.relative_humidity_avg
+    }));
+    
+    return forecast;
+    */
+    
+    // For now, return mock data
+    return generateMockForecastData(3);
+  } catch (error) {
+    console.error('Error fetching forecast data:', error);
+    return generateMockForecastData(3);
   }
 };
 
