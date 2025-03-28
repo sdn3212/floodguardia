@@ -47,18 +47,14 @@ export const getCurrentWeather = async (location: string = 'New York,US'): Promi
 
 export const getForecastData = async (location: string = 'New York,US'): Promise<ForecastData[]> => {
   try {
-    // Attempt to fetch from meteoblue API (this is mocked for now as the API requires coordinates)
-    // In a real implementation, you would convert location to lat/lon coordinates first
-    
-    // For demo purposes, we're falling back to mock data
-    // But here's how you would approach the actual API call:
-    /*
+    // Attempt to fetch from meteoblue API
     const response = await fetch(
       `https://my.meteoblue.com/packages/basic-1h?apikey=${API_KEYS.METEOBLUE}&lat=40.7128&lon=-74.0060&format=json`
     );
     
     if (!response.ok) {
-      throw new Error('Failed to fetch forecast data');
+      console.error('Meteoblue API error:', await response.text());
+      return generateMockForecastData(3); // Fallback to mock data
     }
     
     const data = await response.json();
@@ -74,10 +70,6 @@ export const getForecastData = async (location: string = 'New York,US'): Promise
     }));
     
     return forecast;
-    */
-    
-    // For now, return mock data
-    return generateMockForecastData(3);
   } catch (error) {
     console.error('Error fetching forecast data:', error);
     return generateMockForecastData(3);
@@ -160,4 +152,40 @@ export const registerForNotifications = async (email: string, preferences: {
   await new Promise(resolve => setTimeout(resolve, 800));
   // In a real app, this would update the database
   return true;
+};
+
+// New API function to get evacuation routes
+export const getEvacuationRoutes = async () => {
+  // In a real app, this would fetch from a database or API
+  await new Promise(resolve => setTimeout(resolve, 500));
+  
+  return [
+    {
+      id: "route-1",
+      name: "Primary Route - East",
+      startPoint: "Your Location",
+      endPoint: "Shelter Point",
+      distance: "2.3 miles",
+      estimatedTime: "12 min",
+      isSafe: true
+    },
+    {
+      id: "route-2",
+      name: "Secondary Route - North",
+      startPoint: "Your Location",
+      endPoint: "High Ground Community Center",
+      distance: "3.5 miles",
+      estimatedTime: "18 min",
+      isSafe: true
+    },
+    {
+      id: "route-3",
+      name: "Emergency Route - West",
+      startPoint: "Your Location",
+      endPoint: "Valley Evacuation Center",
+      distance: "4.1 miles",
+      estimatedTime: "25 min",
+      isSafe: false
+    }
+  ];
 };
