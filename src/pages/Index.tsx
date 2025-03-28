@@ -18,9 +18,7 @@ const Index = () => {
       <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
         <div className="md:col-span-8 space-y-6">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div className="lg:col-span-1">
-              <RiskIndicator />
-            </div>
+            <RiskIndicator className="lg:col-span-1" />
             <WeatherWidget className="lg:col-span-2" />
           </div>
           
