@@ -1,282 +1,238 @@
+import { FloodAlert } from "@/types";
 
-import { FloodAlert, ForecastData, RiskLevel, SensorData, WeatherData } from "@/types";
-import { API_KEYS } from "@/config/constants";
-import { generateHistoricalData, generateMockAlerts, generateMockForecastData, generateMockSensorData, generateMockWeatherData } from "./mockData";
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:3000";
 
-// Mock API functions that would normally connect to a backend
-
-export const getCurrentSensorData = async (): Promise<SensorData> => {
-  // Simulate API call delay
-  await new Promise(resolve => setTimeout(resolve, 500));
-  return generateMockSensorData(1)[0];
-};
-
-export const getHistoricalSensorData = async (days: number = 7): Promise<SensorData[]> => {
-  // Simulate API call delay
-  await new Promise(resolve => setTimeout(resolve, 800));
-  return generateHistoricalData(days);
-};
-
-export const getCurrentWeather = async (location: string = 'New York,US'): Promise<WeatherData> => {
+export const getFloodAlerts = async (): Promise<FloodAlert[]> => {
   try {
-    const response = await fetch(
-      `https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(location)}&units=metric&appid=${API_KEYS.OPENWEATHERMAP}`
-    );
+    // Replace with a real API call in production
+    console.log("Fetching flood alerts...");
     
-    if (!response.ok) {
-      console.error('Weather API error:', await response.text());
-      return generateMockWeatherData(); // Fallback to mock data
-    }
-    
-    const data = await response.json();
-    
-    return {
-      location: data.name,
-      temperature: Math.round(data.main.temp * 10) / 10,
-      description: data.weather[0].description,
-      humidity: data.main.humidity,
-      windSpeed: data.wind.speed,
-      icon: data.weather[0].icon,
-      rainfall: data.rain ? data.rain['1h'] || 0 : 0
-    };
-  } catch (error) {
-    console.error('Error fetching weather data:', error);
-    return generateMockWeatherData(); // Fallback to mock data
-  }
-};
-
-export const getForecastData = async (location: string = 'New York,US'): Promise<ForecastData[]> => {
-  try {
-    // Attempt to fetch from meteoblue API
-    const response = await fetch(
-      `https://my.meteoblue.com/packages/basic-1h?apikey=${API_KEYS.METEOBLUE}&lat=40.7128&lon=-74.0060&format=json`
-    );
-    
-    if (!response.ok) {
-      console.error('Meteoblue API error:', await response.text());
-      return generateMockForecastData(3); // Fallback to mock data
-    }
-    
-    const data = await response.json();
-    
-    // Process and transform the data
-    // Check if data.data_1h exists before trying to access it
-    if (!data.data_1h) {
-      console.error('Unexpected Meteoblue API response format:', data);
-      return generateMockForecastData(3);
-    }
-    
-    // Group data by day to create daily forecasts
-    const dailyData: Record<string, any> = {};
-    
-    // Get the first 3 days of data
-    const uniqueDays = [...new Set(data.data_1h.time.map((time: string) => time.split(' ')[0]))].slice(0, 3);
-    
-    uniqueDays.forEach(day => {
-      const dayData = {
-        temperatures: [] as number[],
-        precipitation: 0,
-        humidity: [] as number[],
-        condition: ''
-      };
-      
-      // Find all data points for this day
-      data.data_1h.time.forEach((time: string, index: number) => {
-        if (time.startsWith(day)) {
-          if (data.data_1h.temperature) {
-            dayData.temperatures.push(data.data_1h.temperature[index]);
-          }
-          
-          if (data.data_1h.precipitation) {
-            dayData.precipitation += data.data_1h.precipitation[index] || 0;
-          }
-          
-          if (data.data_1h.relativehumidity) {
-            dayData.humidity.push(data.data_1h.relativehumidity[index]);
-          }
-        }
-      });
-      
-      // Determine weather condition based on precipitation
-      if (dayData.precipitation > 10) {
-        dayData.condition = 'Heavy Rain';
-      } else if (dayData.precipitation > 5) {
-        dayData.condition = 'Moderate Rain';
-      } else if (dayData.precipitation > 0) {
-        dayData.condition = 'Light Rain';
-      } else {
-        dayData.condition = 'Clear';
-      }
-      
-      dailyData[day] = dayData;
-    });
-    
-    // Convert to ForecastData array
-    const forecast = uniqueDays.map(day => {
-      const dayData = dailyData[day];
-      const tempHigh = Math.max(...dayData.temperatures);
-      const tempLow = Math.min(...dayData.temperatures);
-      const avgHumidity = dayData.humidity.length 
-        ? Math.round(dayData.humidity.reduce((a: number, b: number) => a + b, 0) / dayData.humidity.length) 
-        : 0;
-      
-      return {
-        date: new Date(day).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }),
-        condition: dayData.condition,
-        tempHigh: Math.round(tempHigh),
-        tempLow: Math.round(tempLow),
-        precipitation: Math.round(dayData.precipitation * 10) / 10,
-        humidity: avgHumidity
-      };
-    });
-    
-    return forecast;
-  } catch (error) {
-    console.error('Error fetching forecast data:', error);
-    return generateMockForecastData(3);
-  }
-};
-
-export const getFloodAlerts = async (count: number = 5): Promise<FloodAlert[]> => {
-  // Simulate API call delay
-  await new Promise(resolve => setTimeout(resolve, 600));
-  return generateMockAlerts(count);
-};
-
-export const getFloodPrediction = async (): Promise<{riskLevel: RiskLevel, description: string}> => {
-  // Get current sensor data
-  const currentData = await getCurrentSensorData();
-  
-  try {
-    // Call Gemini API for prediction
-    const response = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${API_KEYS.GEMINI}`
+    // Mock data for now
+    const mockAlerts: FloodAlert[] = [
+      {
+        id: "1",
+        message: "Moderate flood risk in downtown area",
+        riskLevel: "medium",
+        timestamp: new Date().toISOString(),
+        isRead: false
       },
-      body: JSON.stringify({
-        contents: [{
-          parts: [{
-            text: `Based on the following sensor data, what is the flood risk? Water level: ${currentData.waterLevel}m, Rainfall: ${currentData.rainfall}mm/h, Temperature: ${currentData.temperature}°C, Humidity: ${currentData.humidity}%, Soil Moisture: ${currentData.soilMoisture}%. Respond with only one of these risk levels: "low", "medium", "high", or "critical" followed by a brief explanation separated by a pipe character (|).`
-          }]
-        }]
-      })
-    });
+      {
+        id: "2",
+        message: "High flood risk in coastal regions due to storm surge",
+        riskLevel: "high",
+        timestamp: new Date(Date.now() - 3600000).toISOString(), // 1 hour ago
+        isRead: true
+      },
+      {
+        id: "3",
+        message: "Critical flood risk in low-lying areas near the river",
+        riskLevel: "critical",
+        timestamp: new Date(Date.now() - 7200000).toISOString(), // 2 hours ago
+        isRead: false
+      }
+    ];
     
-    if (!response.ok) {
-      console.error('Gemini API error:', await response.text());
-      return {
-        riskLevel: currentData.predictionRisk,
-        description: `Based on the current water level of ${currentData.waterLevel}m and rainfall of ${currentData.rainfall}mm/h, combined with soil saturation at ${currentData.soilMoisture}%, the current flood risk is ${currentData.predictionRisk.toUpperCase()}.`
-      };
-    }
+    await new Promise(resolve => setTimeout(resolve, 500));
     
-    const data = await response.json();
-    const predictionText = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
-    
-    // Parse the response - format should be "risk_level|explanation"
-    const [predictedRisk, explanation] = predictionText.split('|').map(part => part.trim());
-    
-    // Validate and normalize risk level
-    let riskLevel: RiskLevel = 'low';
-    if (['low', 'medium', 'high', 'critical'].includes(predictedRisk.toLowerCase())) {
-      riskLevel = predictedRisk.toLowerCase() as RiskLevel;
-    }
-    
-    return {
-      riskLevel,
-      description: explanation || `Based on sensor data analysis, the current flood risk is ${riskLevel.toUpperCase()}.`
-    };
+    return mockAlerts;
   } catch (error) {
-    console.error('Error getting flood prediction:', error);
-    return {
-      riskLevel: currentData.predictionRisk,
-      description: `Based on sensor data analysis, the current flood risk is ${currentData.predictionRisk.toUpperCase()}.`
-    };
+    console.error("Error fetching flood alerts:", error);
+    return [];
   }
 };
 
 export const markAlertAsRead = async (alertId: string): Promise<boolean> => {
-  // Simulate API call delay
-  await new Promise(resolve => setTimeout(resolve, 300));
-  // In a real app, this would update the database
-  return true;
+  try {
+    // Replace with a real API call in production
+    console.log(`Marking alert ${alertId} as read...`);
+    
+    // Mock success for now
+    await new Promise(resolve => setTimeout(resolve, 300));
+    
+    return true;
+  } catch (error) {
+    console.error(`Error marking alert ${alertId} as read:`, error);
+    return false;
+  }
 };
 
-export const registerForNotifications = async (email: string, preferences: {
-  email: boolean, 
-  sms: boolean, 
-  pushNotification: boolean
-}): Promise<boolean> => {
-  // Simulate API call delay
-  await new Promise(resolve => setTimeout(resolve, 800));
-  // In a real app, this would update the database
-  return true;
+export const registerForNotifications = async (email: string, preferences: any): Promise<boolean> => {
+  try {
+    // Replace with a real API call in production
+    console.log(`Registering ${email} for notifications with preferences:`, preferences);
+    
+    // Mock success for now
+    await new Promise(resolve => setTimeout(resolve, 750));
+    
+    return true;
+  } catch (error) {
+    console.error(`Error registering ${email} for notifications:`, error);
+    return false;
+  }
 };
 
-// New API function to get evacuation routes
-export const getEvacuationRoutes = async () => {
-  // In a real app, this would fetch from a database or API
-  await new Promise(resolve => setTimeout(resolve, 500));
+export const fetchSensorReadings = async () => {
+  try {
+    // Replace with a real API call in production
+    console.log("Fetching sensor readings...");
+    
+    // Mock sensor data for now
+    const mockSensorData = {
+      waterLevel: Math.random() * 10,
+      temperature: 25 + Math.random() * 5,
+      humidity: 60 + Math.random() * 15,
+      batteryLevel: 80 + Math.random() * 20
+    };
+    
+    await new Promise(resolve => setTimeout(resolve, 600));
+    
+    return mockSensorData;
+  } catch (error) {
+    console.error("Error fetching sensor readings:", error);
+    throw error;
+  }
+};
+
+export const fetchHistoricalData = async () => {
+  try {
+    // Replace with a real API call in production
+    console.log("Fetching historical data...");
+    
+    // Mock historical data for now
+    const mockHistoricalData = Array.from({ length: 30 }, (_, i) => ({
+      date: new Date(Date.now() - i * 86400000).toISOString(),
+      waterLevel: Math.random() * 10,
+      temperature: 20 + Math.random() * 10,
+      humidity: 50 + Math.random() * 30
+    }));
+    
+    await new Promise(resolve => setTimeout(resolve, 900));
+    
+    return mockHistoricalData;
+  } catch (error) {
+    console.error("Error fetching historical data:", error);
+    throw error;
+  }
+};
+
+export const fetchGeminiAiResponse = async (prompt: string) => {
+  try {
+    // Replace with a real API call in production
+    console.log(`Sending to Gemini AI: ${prompt}`);
+    
+    // Mock a response for now
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    
+    return {
+      response: "Based on the current sensor data and weather forecasts, there is a moderate risk of flooding in the next 24 hours. Consider monitoring water levels closely and prepare for possible evacuation if levels continue to rise.",
+      timestamp: new Date().toISOString()
+    };
+  } catch (error) {
+    console.error("Error fetching AI response:", error);
+    throw error;
+  }
+};
+
+export const connectToHardware = async (deviceId: string, port: string) => {
+  try {
+    console.log(`Connecting to hardware device ${deviceId} on port ${port}`);
+    // Mock connection process
+    await new Promise(resolve => setTimeout(resolve, 1500));
+    return { success: true, message: "Device connected successfully" };
+  } catch (error) {
+    console.error("Failed to connect to hardware:", error);
+    return { success: false, message: "Connection failed" };
+  }
+};
+
+export const fetchWeatherForecast = async (location: string) => {
+  try {
+    console.log(`Fetching weather forecast for ${location}`);
+    // Mock API call
+    await new Promise(resolve => setTimeout(resolve, 800));
+    
+    // Mock data
+    return {
+      location: location,
+      forecast: [
+        {
+          date: new Date().toISOString(),
+          temperature: 22,
+          precipitation: 15,
+          humidity: 65,
+          windSpeed: 12
+        },
+        {
+          date: new Date(Date.now() + 86400000).toISOString(), // tomorrow
+          temperature: 24,
+          precipitation: 20,
+          humidity: 70,
+          windSpeed: 10
+        },
+        {
+          date: new Date(Date.now() + 172800000).toISOString(), // day after tomorrow
+          temperature: 26,
+          precipitation: 5,
+          humidity: 55,
+          windSpeed: 8
+        }
+      ]
+    };
+  } catch (error) {
+    console.error("Error fetching weather forecast:", error);
+    throw error;
+  }
+};
+
+export const processMeteoBlueData = (data: any) => {
+  if (!data || typeof data !== 'object') {
+    throw new Error('Invalid data format');
+  }
   
-  return [
-    {
-      id: "route-1",
-      name: "Primary Route - East",
-      startPoint: "Your Location",
-      endPoint: "Shelter Point",
-      distance: "2.3 miles",
-      estimatedTime: "12 min",
-      isSafe: true
-    },
-    {
-      id: "route-2",
-      name: "Secondary Route - North",
-      startPoint: "Your Location",
-      endPoint: "High Ground Community Center",
-      distance: "3.5 miles",
-      estimatedTime: "18 min",
-      isSafe: true
-    },
-    {
-      id: "route-3",
-      name: "Emergency Route - West",
-      startPoint: "Your Location",
-      endPoint: "Valley Evacuation Center",
-      distance: "4.1 miles",
-      estimatedTime: "25 min",
-      isSafe: false
+  const validatedData = data as Record<string, any>;
+  
+  try {
+    const forecast = [];
+    
+    // Safely access properties with type checks
+    const timestamps = validatedData.time_stamps;
+    const rainfall = validatedData.rainfall;
+    const temperature = validatedData.temperature;
+    
+    if (Array.isArray(timestamps) && Array.isArray(rainfall) && Array.isArray(temperature)) {
+      for (let i = 0; i < timestamps.length; i++) {
+        forecast.push({
+          time: new Date(timestamps[i] as string),
+          rain: rainfall[i],
+          temp: temperature[i]
+        });
+      }
     }
-  ];
+    
+    return forecast;
+  } catch (error) {
+    console.error("Error processing MeteoBlue data:", error);
+    return [];
+  }
 };
 
-// Hardware connectivity API functions
-export const connectToHardware = async (ipAddress: string, port: string): Promise<boolean> => {
-  // In a real app, this would establish a connection to the hardware gateway
-  await new Promise(resolve => setTimeout(resolve, 1500));
-  return true;
-};
+export const sendContactForm = async (data: any) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/contact`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    });
 
-export const getConnectedDevices = async (): Promise<any[]> => {
-  // In a real app, this would fetch the list of connected devices from the hardware gateway
-  await new Promise(resolve => setTimeout(resolve, 1000));
-  return [
-    { id: "ws001", name: "Water Level Sensor #1", type: "ultrasonic", status: "online", lastReading: "6.2m", battery: 87 },
-    { id: "rf001", name: "Rainfall Sensor #1", type: "tipping bucket", status: "online", lastReading: "15.8mm/h", battery: 92 },
-    { id: "th001", name: "Temperature/Humidity #1", type: "DHT22", status: "online", lastReading: "18.5°C / 37%", battery: 78 },
-    { id: "sm001", name: "Soil Moisture #1", type: "capacitive", status: "online", lastReading: "22.4%", battery: 65 }
-  ];
-};
+    if (!response.ok) {
+      throw new Error(`Failed to send message: ${response.status}`);
+    }
 
-export const sendCommandToDevice = async (deviceId: string, command: string): Promise<boolean> => {
-  // In a real app, this would send a command to a specific device
-  await new Promise(resolve => setTimeout(resolve, 800));
-  return true;
-};
-
-export const updateFirmware = async (deviceId: string): Promise<boolean> => {
-  // In a real app, this would update the firmware of a specific device
-  await new Promise(resolve => setTimeout(resolve, 3000));
-  return true;
+    return await response.json();
+  } catch (error) {
+    console.error("Error sending contact form:", error);
+    throw error;
+  }
 };

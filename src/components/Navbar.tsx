@@ -51,7 +51,7 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="bg-white/95 backdrop-blur-sm border-b border-gray-200 fixed w-full z-30">
+    <nav className="bg-background/95 backdrop-blur-sm border-b border-gray-700 fixed w-full z-30">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
           <div className="flex items-center">
@@ -59,7 +59,7 @@ const Navbar = () => {
               <div className="h-8 w-8 bg-blue-500 rounded-md flex items-center justify-center mr-2">
                 <div className="h-4 w-4 bg-white rounded-full animate-pulse-slow"></div>
               </div>
-              <span className="text-xl font-bold text-gray-900">FloodGuardia</span>
+              <span className="text-xl font-bold text-foreground">Protex</span>
             </div>
           </div>
           
@@ -77,7 +77,7 @@ const Navbar = () => {
               <a href="/arduino">IoT Setup</a>
             </Button>
             <Button variant="link" asChild>
-              <a href="/settings">Settings</a>
+              <a href="/contact">Contact Us</a>
             </Button>
             
             <Popover>
@@ -92,7 +92,7 @@ const Navbar = () => {
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-80 p-0" align="end">
-                <div className="p-3 border-b border-gray-200">
+                <div className="p-3 border-b border-gray-700">
                   <h3 className="font-semibold">Notifications</h3>
                 </div>
                 <div className="max-h-[300px] overflow-y-auto">
@@ -101,8 +101,8 @@ const Navbar = () => {
                       <div 
                         key={alert.id}
                         className={cn(
-                          "p-3 border-b border-gray-100 cursor-pointer hover:bg-gray-50 transition-colors",
-                          !alert.isRead && "bg-blue-50"
+                          "p-3 border-b border-gray-700 cursor-pointer hover:bg-muted transition-colors",
+                          !alert.isRead && "bg-blue-900/20"
                         )}
                         onClick={() => handleAlertRead(alert.id)}
                       >
@@ -110,13 +110,13 @@ const Navbar = () => {
                           <div className={cn("w-2 h-2 rounded-full mt-1.5", RISK_LEVEL_COLORS[alert.riskLevel])} />
                           <div className="flex-1">
                             <p className="text-sm font-medium">{alert.message}</p>
-                            <p className="text-xs text-gray-500 mt-1">{formatDate(alert.timestamp)}</p>
+                            <p className="text-xs text-gray-400 mt-1">{formatDate(alert.timestamp)}</p>
                           </div>
                         </div>
                       </div>
                     ))
                   ) : (
-                    <div className="p-4 text-center text-gray-500">No notifications</div>
+                    <div className="p-4 text-center text-gray-400">No notifications</div>
                   )}
                 </div>
               </PopoverContent>
@@ -136,7 +136,7 @@ const Navbar = () => {
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-80 p-0" align="end">
-                <div className="p-3 border-b border-gray-200">
+                <div className="p-3 border-b border-gray-700">
                   <h3 className="font-semibold">Notifications</h3>
                 </div>
                 <div className="max-h-[300px] overflow-y-auto">
@@ -145,8 +145,8 @@ const Navbar = () => {
                       <div 
                         key={alert.id}
                         className={cn(
-                          "p-3 border-b border-gray-100 cursor-pointer hover:bg-gray-50 transition-colors",
-                          !alert.isRead && "bg-blue-50"
+                          "p-3 border-b border-gray-700 cursor-pointer hover:bg-muted transition-colors",
+                          !alert.isRead && "bg-blue-900/20"
                         )}
                         onClick={() => handleAlertRead(alert.id)}
                       >
@@ -154,13 +154,13 @@ const Navbar = () => {
                           <div className={cn("w-2 h-2 rounded-full mt-1.5", RISK_LEVEL_COLORS[alert.riskLevel])} />
                           <div className="flex-1">
                             <p className="text-sm font-medium">{alert.message}</p>
-                            <p className="text-xs text-gray-500 mt-1">{formatDate(alert.timestamp)}</p>
+                            <p className="text-xs text-gray-400 mt-1">{formatDate(alert.timestamp)}</p>
                           </div>
                         </div>
                       </div>
                     ))
                   ) : (
-                    <div className="p-4 text-center text-gray-500">No notifications</div>
+                    <div className="p-4 text-center text-gray-400">No notifications</div>
                   )}
                 </div>
               </PopoverContent>
@@ -176,7 +176,7 @@ const Navbar = () => {
       {/* Mobile menu */}
       {isMenuOpen && isMobile && (
         <div className="md:hidden">
-          <div className="pt-2 pb-4 px-4 space-y-1 sm:px-6 bg-white border-b border-gray-200">
+          <div className="pt-2 pb-4 px-4 space-y-1 sm:px-6 bg-background border-b border-gray-700">
             <Button variant="ghost" className="w-full justify-start" asChild>
               <a href="/">Dashboard</a>
             </Button>
@@ -190,7 +190,7 @@ const Navbar = () => {
               <a href="/arduino">IoT Setup</a>
             </Button>
             <Button variant="ghost" className="w-full justify-start" asChild>
-              <a href="/settings">Settings</a>
+              <a href="/contact">Contact Us</a>
             </Button>
           </div>
         </div>

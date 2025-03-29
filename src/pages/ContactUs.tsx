@@ -16,7 +16,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Switch } from "@/components/ui/switch";
 import { registerForNotifications } from "@/utils/api";
 
-const Settings = () => {
+const ContactUs = () => {
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [location, setLocation] = useState("");
@@ -26,7 +26,7 @@ const Settings = () => {
   const [isLoading, setIsLoading] = useState(false);
   
   useEffect(() => {
-    document.title = "FloodGuardia - Settings";
+    document.title = "Protex - Contact Us";
   }, []);
   
   const handleSaveNotifications = async () => {
@@ -59,7 +59,7 @@ const Settings = () => {
   return (
     <Layout>
       <div className="space-y-6">
-        <h1 className="text-2xl font-bold">Settings</h1>
+        <h1 className="text-2xl font-bold">Contact Us</h1>
         
         <Tabs defaultValue="notifications">
           <TabsList className="grid w-full grid-cols-3">
@@ -113,13 +113,13 @@ const Settings = () => {
                   </div>
                 </div>
                 
-                <div className="space-y-4 pt-4 border-t">
+                <div className="space-y-4 pt-4 border-t border-gray-700">
                   <h3 className="font-medium">Alert Methods</h3>
                   
                   <div className="flex items-center justify-between">
                     <div className="space-y-0.5">
                       <Label htmlFor="email-alerts">Email Alerts</Label>
-                      <p className="text-sm text-gray-500">Receive alerts via email</p>
+                      <p className="text-sm text-gray-400">Receive alerts via email</p>
                     </div>
                     <Switch 
                       id="email-alerts" 
@@ -131,7 +131,7 @@ const Settings = () => {
                   <div className="flex items-center justify-between">
                     <div className="space-y-0.5">
                       <Label htmlFor="sms-alerts">SMS Alerts</Label>
-                      <p className="text-sm text-gray-500">Get text messages for critical alerts</p>
+                      <p className="text-sm text-gray-400">Get text messages for critical alerts</p>
                     </div>
                     <Switch 
                       id="sms-alerts" 
@@ -143,7 +143,7 @@ const Settings = () => {
                   <div className="flex items-center justify-between">
                     <div className="space-y-0.5">
                       <Label htmlFor="push-alerts">Push Notifications</Label>
-                      <p className="text-sm text-gray-500">Receive browser notifications</p>
+                      <p className="text-sm text-gray-400">Receive browser notifications</p>
                     </div>
                     <Switch 
                       id="push-alerts" 
@@ -153,38 +153,38 @@ const Settings = () => {
                   </div>
                 </div>
                 
-                <div className="space-y-4 pt-4 border-t">
+                <div className="space-y-4 pt-4 border-t border-gray-700">
                   <h3 className="font-medium">Alert Thresholds</h3>
                   
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="flex items-center justify-between border p-3 rounded-md">
+                    <div className="flex items-center justify-between border border-gray-700 p-3 rounded-md">
                       <div>
                         <p className="font-medium">Medium Risk</p>
-                        <p className="text-sm text-gray-500">Potential flood conditions</p>
+                        <p className="text-sm text-gray-400">Potential flood conditions</p>
                       </div>
                       <Switch defaultChecked />
                     </div>
                     
-                    <div className="flex items-center justify-between border p-3 rounded-md">
+                    <div className="flex items-center justify-between border border-gray-700 p-3 rounded-md">
                       <div>
                         <p className="font-medium">High Risk</p>
-                        <p className="text-sm text-gray-500">Significant flood risk</p>
+                        <p className="text-sm text-gray-400">Significant flood risk</p>
                       </div>
                       <Switch defaultChecked />
                     </div>
                     
-                    <div className="flex items-center justify-between border p-3 rounded-md">
+                    <div className="flex items-center justify-between border border-gray-700 p-3 rounded-md">
                       <div>
                         <p className="font-medium">Critical Risk</p>
-                        <p className="text-sm text-gray-500">Imminent flooding</p>
+                        <p className="text-sm text-gray-400">Imminent flooding</p>
                       </div>
                       <Switch defaultChecked />
                     </div>
                     
-                    <div className="flex items-center justify-between border p-3 rounded-md">
+                    <div className="flex items-center justify-between border border-gray-700 p-3 rounded-md">
                       <div>
                         <p className="font-medium">All Clear</p>
-                        <p className="text-sm text-gray-500">When risk subsides</p>
+                        <p className="text-sm text-gray-400">When risk subsides</p>
                       </div>
                       <Switch defaultChecked />
                     </div>
@@ -235,7 +235,7 @@ const Settings = () => {
                   </div>
                 </div>
                 
-                <div className="pt-4 border-t">
+                <div className="pt-4 border-t border-gray-700">
                   <Button className="w-full md:w-auto">
                     Update Account Information
                   </Button>
@@ -253,7 +253,7 @@ const Settings = () => {
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
-                <div className="border p-4 rounded-lg bg-gray-50">
+                <div className="border border-gray-700 p-4 rounded-lg bg-muted">
                   <h3 className="font-medium mb-2">API Keys</h3>
                   <div className="flex items-center space-x-3">
                     <Input 
@@ -265,46 +265,46 @@ const Settings = () => {
                       Generate New Key
                     </Button>
                   </div>
-                  <p className="text-xs text-gray-500 mt-2">
-                    Your API key provides access to the FloodGuardia API. Keep it secure.
+                  <p className="text-xs text-gray-400 mt-2">
+                    Your API key provides access to the Protex API. Keep it secure.
                   </p>
                 </div>
                 
                 <div className="space-y-3">
                   <h3 className="font-medium">External Integrations</h3>
                   
-                  <div className="border p-4 rounded-lg">
+                  <div className="border border-gray-700 p-4 rounded-lg">
                     <div className="flex items-center justify-between">
                       <div>
                         <p className="font-medium">Weather API</p>
-                        <p className="text-sm text-gray-500">Integrates with OpenWeatherMap</p>
+                        <p className="text-sm text-gray-400">Integrates with OpenWeatherMap</p>
                       </div>
                       <Switch defaultChecked />
                     </div>
                   </div>
                   
-                  <div className="border p-4 rounded-lg">
+                  <div className="border border-gray-700 p-4 rounded-lg">
                     <div className="flex items-center justify-between">
                       <div>
                         <p className="font-medium">Gemini AI</p>
-                        <p className="text-sm text-gray-500">For advanced flood predictions</p>
+                        <p className="text-sm text-gray-400">For advanced flood predictions</p>
                       </div>
                       <Switch defaultChecked />
                     </div>
                   </div>
                   
-                  <div className="border p-4 rounded-lg">
+                  <div className="border border-gray-700 p-4 rounded-lg">
                     <div className="flex items-center justify-between">
                       <div>
                         <p className="font-medium">SMS Notifications</p>
-                        <p className="text-sm text-gray-500">Through Twilio API</p>
+                        <p className="text-sm text-gray-400">Through Twilio API</p>
                       </div>
                       <Switch defaultChecked />
                     </div>
                   </div>
                 </div>
                 
-                <div className="pt-4 border-t">
+                <div className="pt-4 border-t border-gray-700">
                   <Button className="w-full md:w-auto">
                     Save API Settings
                   </Button>
@@ -318,4 +318,4 @@ const Settings = () => {
   );
 };
 
-export default Settings;
+export default ContactUs;

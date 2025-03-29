@@ -16,7 +16,7 @@ import WaterLevelTrendsWidget from "@/components/WaterLevelTrendsWidget";
 
 const Index = () => {
   useEffect(() => {
-    document.title = "FloodGuardia - Dashboard";
+    document.title = "Protex - Dashboard";
   }, []);
   
   return (

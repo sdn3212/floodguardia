@@ -10,7 +10,7 @@ import Map from "./pages/Map";
 import Historical from "./pages/Historical";
 import Arduino from "./pages/Arduino";
 import Hardware from "./pages/Hardware";
-import Settings from "./pages/Settings";
+import ContactUs from "./pages/ContactUs";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -28,7 +28,7 @@ const App = () => (
             <Route path="/historical" element={<Historical />} />
             <Route path="/arduino" element={<Arduino />} />
             <Route path="/hardware" element={<Hardware />} />
-            <Route path="/settings" element={<Settings />} />
+            <Route path="/contact" element={<ContactUs />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
