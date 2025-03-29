@@ -1,4 +1,3 @@
-
 import { FloodAlert, RiskLevel, ForecastData, WeatherData, SensorData } from "@/types";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:3000";
@@ -178,23 +177,27 @@ export const getForecastData = async (): Promise<ForecastData[]> => {
   }
 };
 
-export const getHistoricalSensorData = async (days: number = 30): Promise<any[]> => {
+export const getHistoricalSensorData = async (days: number = 30): Promise<SensorData[]> => {
   try {
     console.log(`Fetching historical sensor data for the past ${days} days...`);
     
     // Mock historical data
-    const mockHistoricalData = Array.from({ length: days }, (_, i) => {
+    const mockHistoricalData: SensorData[] = Array.from({ length: days }, (_, i) => {
       const date = new Date();
       date.setDate(date.getDate() - i);
       
+      // Ensure we're creating a valid date string
+      const validDate = date.toISOString();
+      
       return {
-        date: date.toISOString(),
+        id: `sensor-hist-${i}`,
+        timestamp: validDate,
         waterLevel: Math.random() * 10,
         rainfall: Math.random() * 50,
         temperature: 15 + Math.random() * 15,
         humidity: 40 + Math.random() * 60,
         soilMoisture: 30 + Math.random() * 70,
-        predictionRisk: ["low", "medium", "high", "critical"][Math.floor(Math.random() * 4)]
+        predictionRisk: ["low", "medium", "high", "critical"][Math.floor(Math.random() * 4)] as RiskLevel
       };
     });
     

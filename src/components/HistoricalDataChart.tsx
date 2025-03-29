@@ -43,28 +43,50 @@ const HistoricalDataChart = () => {
   }, [timeRange]);
   
   const formatDate = (timestamp: string) => {
-    const date = new Date(timestamp);
-    return new Intl.DateTimeFormat('en-US', {
-      month: 'short',
-      day: 'numeric'
-    }).format(date);
+    try {
+      // Validate timestamp before creating Date object
+      if (!timestamp || isNaN(Date.parse(timestamp))) {
+        return "Invalid Date";
+      }
+      
+      const date = new Date(timestamp);
+      return new Intl.DateTimeFormat('en-US', {
+        month: 'short',
+        day: 'numeric'
+      }).format(date);
+    } catch (error) {
+      console.error('Error formatting date:', error, timestamp);
+      return "Invalid Date";
+    }
   };
   
   const formatTooltipDate = (timestamp: string) => {
-    const date = new Date(timestamp);
-    return new Intl.DateTimeFormat('en-US', {
-      month: 'short',
-      day: 'numeric',
-      hour: 'numeric',
-      minute: 'numeric'
-    }).format(date);
+    try {
+      // Validate timestamp before creating Date object
+      if (!timestamp || isNaN(Date.parse(timestamp))) {
+        return "Invalid Date";
+      }
+      
+      const date = new Date(timestamp);
+      return new Intl.DateTimeFormat('en-US', {
+        month: 'short',
+        day: 'numeric',
+        hour: 'numeric',
+        minute: 'numeric'
+      }).format(date);
+    } catch (error) {
+      console.error('Error formatting tooltip date:', error, timestamp);
+      return "Invalid Date";
+    }
   };
   
   const prepareChartData = () => {
-    return data.map(item => ({
-      ...item,
-      date: formatDate(item.timestamp)
-    }));
+    return data
+      .filter(item => item && item.timestamp && !isNaN(Date.parse(item.timestamp)))
+      .map(item => ({
+        ...item,
+        date: formatDate(item.timestamp)
+      }));
   };
   
   const CustomTooltip = ({ active, payload, label }: any) => {
