@@ -33,7 +33,7 @@ const Index = () => {
           </div>
           
           <div className="space-y-4">
-            <h2 className="text-xl font-semibold">Current Sensor Readings</h2>
+            <h2 className="text-xl font-semibold text-card-foreground">Current Sensor Readings</h2>
             <SensorReadings />
           </div>
           

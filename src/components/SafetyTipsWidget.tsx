@@ -39,30 +39,30 @@ const SafetyTipsWidget = ({ className }: SafetyTipsWidgetProps) => {
   ];
 
   return (
-    <Card className={className}>
-      <CardHeader className="pb-2">
-        <CardTitle className="flex items-center">
-          <LifeBuoy className="h-5 w-5 mr-2 text-blue-500" />
+    <Card className={`border-border bg-gradient-to-br from-card to-card/80 ${className}`}>
+      <CardHeader className="pb-2 border-b border-border/50">
+        <CardTitle className="flex items-center text-card-foreground">
+          <LifeBuoy className="h-5 w-5 mr-2 text-blue-400" />
           Flood Safety Tips
         </CardTitle>
       </CardHeader>
-      <CardContent>
+      <CardContent className="pt-4">
         <div className="space-y-2">
           {safetyTips.map((section, index) => (
             <Collapsible 
               key={index} 
               open={index === 0 ? true : open} 
               onOpenChange={index === 0 ? undefined : setOpen}
-              className="border rounded-md overflow-hidden"
+              className="border border-border rounded-md overflow-hidden"
             >
-              <CollapsibleTrigger className="flex items-center justify-between w-full p-3 font-medium bg-gray-50 hover:bg-gray-100">
+              <CollapsibleTrigger className="flex items-center justify-between w-full p-3 font-medium bg-secondary/50 hover:bg-secondary text-card-foreground">
                 {section.title}
                 <Info className="h-4 w-4" />
               </CollapsibleTrigger>
-              <CollapsibleContent className="p-3">
+              <CollapsibleContent className="p-3 bg-card/50">
                 <ul className="list-disc pl-5 space-y-1">
                   {section.tips.map((tip, tipIndex) => (
-                    <li key={tipIndex} className="text-sm">{tip}</li>
+                    <li key={tipIndex} className="text-sm text-card-foreground">{tip}</li>
                   ))}
                 </ul>
               </CollapsibleContent>

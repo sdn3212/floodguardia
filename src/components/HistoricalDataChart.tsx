@@ -94,16 +94,16 @@ const HistoricalDataChart = () => {
       const data = payload[0].payload;
       
       return (
-        <div className="bg-white p-3 border rounded shadow-lg">
-          <p className="font-medium text-gray-800">{formatTooltipDate(data.timestamp)}</p>
+        <div className="bg-card border border-border p-3 rounded shadow-xl">
+          <p className="font-medium text-card-foreground">{formatTooltipDate(data.timestamp)}</p>
           <div className="mt-2 space-y-1">
-            <p className="text-blue-500">Water Level: {data.waterLevel} m</p>
-            <p className="text-indigo-500">Rainfall: {data.rainfall} mm/h</p>
-            <p className="text-orange-500">Temperature: {data.temperature} °C</p>
-            <p className="text-teal-500">Humidity: {data.humidity} %</p>
-            <p className="text-green-500">Soil Moisture: {data.soilMoisture} %</p>
+            <p className="text-blue-400">Water Level: {data.waterLevel} m</p>
+            <p className="text-indigo-400">Rainfall: {data.rainfall} mm/h</p>
+            <p className="text-orange-400">Temperature: {data.temperature} °C</p>
+            <p className="text-teal-400">Humidity: {data.humidity} %</p>
+            <p className="text-green-400">Soil Moisture: {data.soilMoisture} %</p>
           </div>
-          <p className="mt-2 font-medium">
+          <p className="mt-2 font-medium text-card-foreground">
             Risk: <span className="uppercase">{data.predictionRisk}</span>
           </p>
         </div>
@@ -114,27 +114,27 @@ const HistoricalDataChart = () => {
   };
   
   return (
-    <Card className="h-full">
-      <CardHeader className="flex flex-row items-center justify-between pb-2">
-        <CardTitle>Historical Data</CardTitle>
+    <Card className="h-full border-border bg-gradient-to-br from-card to-card/80">
+      <CardHeader className="flex flex-row items-center justify-between pb-2 border-b border-border/50">
+        <CardTitle className="text-card-foreground">Historical Data</CardTitle>
         <Select
           value={timeRange}
           onValueChange={setTimeRange}
         >
-          <SelectTrigger className="w-[120px]">
+          <SelectTrigger className="w-[140px] bg-secondary text-secondary-foreground">
             <SelectValue placeholder="Time Range" />
           </SelectTrigger>
-          <SelectContent>
+          <SelectContent className="bg-popover text-popover-foreground">
             <SelectItem value="7">Last 7 Days</SelectItem>
             <SelectItem value="14">Last 14 Days</SelectItem>
             <SelectItem value="30">Last 30 Days</SelectItem>
           </SelectContent>
         </Select>
       </CardHeader>
-      <CardContent className="p-1">
+      <CardContent className="p-2 pt-4">
         {isLoading ? (
           <div className="flex items-center justify-center h-[300px]">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
           </div>
         ) : (
           <ResponsiveContainer width="100%" height={300}>
@@ -142,29 +142,30 @@ const HistoricalDataChart = () => {
               data={prepareChartData()}
               margin={{ top: 5, right: 20, left: 0, bottom: 5 }}
             >
-              <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+              <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
               <XAxis 
                 dataKey="date" 
-                tick={{ fontSize: 12 }} 
+                tick={{ fontSize: 12, fill: "hsl(var(--muted-foreground))" }} 
                 tickMargin={10}
-                stroke="#9ca3af"
+                stroke="hsl(var(--muted-foreground))"
               />
               <YAxis 
-                tick={{ fontSize: 12 }}
+                tick={{ fontSize: 12, fill: "hsl(var(--muted-foreground))" }}
                 tickMargin={10}
-                stroke="#9ca3af"
+                stroke="hsl(var(--muted-foreground))"
               />
               <Tooltip content={<CustomTooltip />} />
               <Legend 
                 verticalAlign="top" 
                 height={40}
                 wrapperStyle={{ paddingTop: '15px' }}
+                formatter={(value) => <span className="text-card-foreground">{value}</span>}
               />
               <Line 
                 type="monotone" 
                 dataKey="waterLevel" 
                 name="Water Level (m)"
-                stroke="#3b82f6" 
+                stroke="#60a5fa" 
                 activeDot={{ r: 6 }} 
                 dot={{ r: 3 }}
                 strokeWidth={2}
@@ -173,7 +174,7 @@ const HistoricalDataChart = () => {
                 type="monotone" 
                 dataKey="rainfall" 
                 name="Rainfall (mm/h)"
-                stroke="#6366f1" 
+                stroke="#a5b4fc" 
                 activeDot={{ r: 6 }} 
                 dot={{ r: 3 }}
                 strokeWidth={2}
@@ -182,7 +183,7 @@ const HistoricalDataChart = () => {
                 type="monotone" 
                 dataKey="soilMoisture" 
                 name="Soil Moisture (%)"
-                stroke="#10b981" 
+                stroke="#6ee7b7" 
                 activeDot={{ r: 6 }} 
                 dot={{ r: 3 }}
                 strokeWidth={2}

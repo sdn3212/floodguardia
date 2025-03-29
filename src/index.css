@@ -92,10 +92,46 @@
 
   body {
     @apply bg-background text-foreground;
+    background-image: 
+      radial-gradient(at 30% 20%, hsla(222, 60%, 10%, 1) 0px, transparent 50%),
+      radial-gradient(at 80% 70%, hsla(210, 60%, 10%, 1) 0px, transparent 50%);
+    background-attachment: fixed;
+  }
+  
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  
+  ::-webkit-scrollbar-track {
+    @apply bg-secondary/50;
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    @apply bg-primary/40 rounded-full hover:bg-primary/60 transition-colors;
   }
 }
 
 .mapboxgl-canvas {
   width: 100% !important;
   height: 100% !important;
+}
+
+/* Enhanced card styling */
+.card {
+  @apply border-border/50 backdrop-blur-sm transition-all duration-300;
+}
+
+.card:hover {
+  @apply shadow-lg shadow-black/20 border-border/80;
+}
+
+/* Improved button focus states */
+button:focus, a:focus {
+  @apply ring-2 ring-primary/30 outline-none;
+}
+
+/* Text shadow for better readability on dark backgrounds */
+h1, h2, h3, .card-title {
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
 }

@@ -52,23 +52,23 @@ const SensorReadings = () => {
     const percentage = getSensorPercentage(value, min, max);
     
     return (
-      <Card>
-        <CardHeader className="pb-2">
-          <CardTitle className="text-sm font-medium text-gray-500 flex items-center">
+      <Card className="border-border bg-gradient-to-br from-card to-card/90">
+        <CardHeader className="pb-2 border-b border-border/30">
+          <CardTitle className="text-sm font-medium text-muted-foreground flex items-center">
             <Icon className="h-4 w-4 mr-1" /> {title}
           </CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="pt-4">
           <div className="flex justify-between items-baseline">
-            <div className="text-2xl font-bold">{value} {unit}</div>
+            <div className="text-2xl font-bold text-card-foreground">{value} <span className="text-sm text-muted-foreground">{unit}</span></div>
           </div>
-          <div className="mt-3 h-2 w-full bg-gray-100 rounded-full overflow-hidden">
+          <div className="mt-3 h-2 w-full bg-secondary rounded-full overflow-hidden">
             <div 
               className={`h-full ${colorClass} rounded-full`} 
               style={{ width: `${percentage}%` }}
             ></div>
           </div>
-          <div className="mt-1 flex justify-between text-xs text-gray-500">
+          <div className="mt-1 flex justify-between text-xs text-muted-foreground">
             <span>{min} {unit}</span>
             <span>{max} {unit}</span>
           </div>
@@ -81,14 +81,14 @@ const SensorReadings = () => {
     return (
       <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4 animate-pulse">
         {[...Array(5)].map((_, i) => (
-          <div key={i} className="bg-gray-200 rounded-lg h-32"></div>
+          <div key={i} className="bg-secondary rounded-lg h-32"></div>
         ))}
       </div>
     );
   }
   
   if (!data) {
-    return <div>Error loading sensor data</div>;
+    return <div className="text-card-foreground">Error loading sensor data</div>;
   }
   
   return (

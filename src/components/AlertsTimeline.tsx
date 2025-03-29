@@ -1,12 +1,10 @@
 
 import { useEffect, useState } from "react";
 import { FloodAlert } from "@/types";
-import { getFloodAlerts, markAlertAsRead } from "@/utils/api";
-import { cn } from "@/lib/utils";
-import { RISK_LEVEL_COLORS } from "@/config/constants";
+import { getAlerts } from "@/utils/api";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { BellOff } from "lucide-react";
+import { AlertCircle, Bell, Clock } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 
 const AlertsTimeline = () => {
   const [alerts, setAlerts] = useState<FloodAlert[]>([]);
@@ -16,7 +14,8 @@ const AlertsTimeline = () => {
     const fetchAlerts = async () => {
       setIsLoading(true);
       try {
-        const data = await getFloodAlerts(10);
+        // Call getAlerts without arguments
+        const data = await getAlerts();
         setAlerts(data);
       } catch (error) {
         console.error('Error fetching alerts:', error);
@@ -26,94 +25,93 @@ const AlertsTimeline = () => {
     };
     
     fetchAlerts();
+    
+    // Refresh every 5 minutes
+    const interval = setInterval(fetchAlerts, 5 * 60 * 1000);
+    return () => clearInterval(interval);
   }, []);
   
-  const handleAlertRead = async (alertId: string) => {
-    const success = await markAlertAsRead(alertId);
-    if (success) {
-      setAlerts(prevAlerts => 
-        prevAlerts.map(alert => 
-          alert.id === alertId ? { ...alert, isRead: true } : alert
-        )
-      );
-    }
+  const formatAlertTime = (timestamp: string) => {
+    const date = new Date(timestamp);
+    return new Intl.DateTimeFormat('en-US', {
+      hour: 'numeric',
+      minute: 'numeric',
+      hour12: true,
+      month: 'short',
+      day: 'numeric'
+    }).format(date);
   };
   
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return new Intl.DateTimeFormat('en-US', {
-      month: 'short',
-      day: 'numeric',
-      hour: 'numeric',
-      minute: 'numeric'
-    }).format(date);
+  const getAlertBadgeColor = (severity: string) => {
+    switch (severity.toLowerCase()) {
+      case 'high':
+        return 'bg-red-500 hover:bg-red-600';
+      case 'medium':
+        return 'bg-orange-500 hover:bg-orange-600';
+      case 'low':
+        return 'bg-blue-500 hover:bg-blue-600';
+      default:
+        return 'bg-gray-500 hover:bg-gray-600';
+    }
   };
   
   if (isLoading) {
     return (
-      <Card className="h-full">
-        <CardHeader>
-          <CardTitle>Recent Alerts</CardTitle>
+      <Card className="animate-pulse">
+        <CardHeader className="pb-2">
+          <div className="h-6 bg-gray-200 rounded w-1/3"></div>
         </CardHeader>
-        <CardContent className="space-y-4">
-          {[...Array(5)].map((_, i) => (
-            <div key={i} className="flex space-x-3 animate-pulse">
-              <div className="w-2 h-2 rounded-full bg-gray-200 mt-2"></div>
-              <div className="flex-1">
-                <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
-                <div className="h-3 bg-gray-200 rounded w-1/4"></div>
+        <CardContent>
+          <div className="space-y-4">
+            {[...Array(3)].map((_, i) => (
+              <div key={i} className="flex gap-4">
+                <div className="h-10 w-10 rounded-full bg-gray-200"></div>
+                <div className="space-y-2 flex-1">
+                  <div className="h-4 bg-gray-200 rounded w-2/3"></div>
+                  <div className="h-3 bg-gray-200 rounded w-full"></div>
+                </div>
               </div>
-            </div>
-          ))}
-        </CardContent>
-      </Card>
-    );
-  }
-  
-  if (alerts.length === 0) {
-    return (
-      <Card className="h-full">
-        <CardHeader>
-          <CardTitle>Recent Alerts</CardTitle>
-        </CardHeader>
-        <CardContent className="flex flex-col items-center justify-center h-full p-6 text-center">
-          <BellOff className="h-12 w-12 text-gray-300 mb-3" />
-          <p className="text-gray-500 mb-4">No flood alerts at this time</p>
-          <Button variant="outline">Notification Settings</Button>
+            ))}
+          </div>
         </CardContent>
       </Card>
     );
   }
   
   return (
-    <Card className="h-full">
-      <CardHeader>
-        <CardTitle>Recent Alerts</CardTitle>
+    <Card className="border-border bg-gradient-to-br from-card to-card/80">
+      <CardHeader className="pb-2 border-b border-border/50">
+        <CardTitle className="flex items-center">
+          <Bell className="h-5 w-5 mr-2 text-red-400" />
+          Recent Alerts
+        </CardTitle>
       </CardHeader>
-      <CardContent>
-        <div className="space-y-4 max-h-[400px] overflow-y-auto pr-2">
-          {alerts.map(alert => (
-            <div 
-              key={alert.id}
-              className={cn(
-                "flex space-x-3 p-3 rounded-md transition-colors cursor-pointer hover:bg-gray-50",
-                !alert.isRead && "bg-blue-50"
-              )}
-              onClick={() => handleAlertRead(alert.id)}
-            >
-              <div className={cn("w-2 h-2 rounded-full mt-2", RISK_LEVEL_COLORS[alert.riskLevel])} />
-              <div className="flex-1">
-                <p className={cn(
-                  "text-sm",
-                  !alert.isRead && "font-medium"
-                )}>
-                  {alert.message}
-                </p>
-                <p className="text-xs text-gray-500 mt-1">{formatDate(alert.timestamp)}</p>
+      <CardContent className="pt-4">
+        {alerts.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-6 text-muted-foreground">
+            <AlertCircle className="h-10 w-10 mb-2 text-muted-foreground/60" />
+            <p>No recent alerts</p>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            {alerts.map((alert, index) => (
+              <div key={index} className="relative pl-6 pb-4 last:pb-0 last:before:hidden before:absolute before:left-2 before:top-2 before:h-full before:w-px before:bg-border">
+                <div className="absolute left-0 top-2 h-4 w-4 rounded-full bg-primary"></div>
+                <div className="flex justify-between items-start mb-1">
+                  <h4 className="font-medium text-card-foreground">{alert.title}</h4>
+                  <Badge className={`text-white ml-2 ${getAlertBadgeColor(alert.severity)}`}>
+                    {alert.severity}
+                  </Badge>
+                </div>
+                <p className="text-muted-foreground text-sm mb-1">{alert.message}</p>
+                <div className="flex items-center text-xs text-muted-foreground mt-1">
+                  <Clock className="h-3 w-3 mr-1" />
+                  {formatAlertTime(alert.timestamp)}
+                </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </CardContent>
     </Card>
   );
