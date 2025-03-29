@@ -1,6 +1,7 @@
-import { FloodAlert } from "@/types";
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:3000";
+import { FloodAlert, RiskLevel, ForecastData, WeatherData, SensorData } from "@/types";
+
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:3000";
 
 export const getFloodAlerts = async (): Promise<FloodAlert[]> => {
   try {
@@ -14,21 +15,24 @@ export const getFloodAlerts = async (): Promise<FloodAlert[]> => {
         message: "Moderate flood risk in downtown area",
         riskLevel: "medium",
         timestamp: new Date().toISOString(),
-        isRead: false
+        isRead: false,
+        location: "Downtown"
       },
       {
         id: "2",
         message: "High flood risk in coastal regions due to storm surge",
         riskLevel: "high",
         timestamp: new Date(Date.now() - 3600000).toISOString(), // 1 hour ago
-        isRead: true
+        isRead: true,
+        location: "Coastal Region"
       },
       {
         id: "3",
         message: "Critical flood risk in low-lying areas near the river",
         riskLevel: "critical",
         timestamp: new Date(Date.now() - 7200000).toISOString(), // 2 hours ago
-        isRead: false
+        isRead: false,
+        location: "Riverside"
       }
     ];
     
@@ -37,6 +41,168 @@ export const getFloodAlerts = async (): Promise<FloodAlert[]> => {
     return mockAlerts;
   } catch (error) {
     console.error("Error fetching flood alerts:", error);
+    return [];
+  }
+};
+
+export const getFloodPrediction = async (): Promise<{ riskLevel: RiskLevel; description: string }> => {
+  try {
+    console.log("Fetching flood prediction...");
+    
+    // Mock data for now
+    const riskLevels: RiskLevel[] = ["low", "medium", "high", "critical"];
+    const randomIndex = Math.floor(Math.random() * riskLevels.length);
+    const riskLevel = riskLevels[randomIndex];
+    
+    let description = "";
+    switch (riskLevel) {
+      case "low":
+        description = "No significant flood risk in your area at this time.";
+        break;
+      case "medium":
+        description = "Moderate flood risk due to recent rainfall. Stay informed.";
+        break;
+      case "high":
+        description = "High flood risk in your area. Consider preparation measures.";
+        break;
+      case "critical":
+        description = "Critical flood risk! Immediate action may be required.";
+        break;
+    }
+    
+    await new Promise(resolve => setTimeout(resolve, 700));
+    
+    return { riskLevel, description };
+  } catch (error) {
+    console.error("Error fetching flood prediction:", error);
+    return { riskLevel: "low", description: "Unable to fetch prediction data." };
+  }
+};
+
+export const getCurrentSensorData = async (): Promise<SensorData[]> => {
+  try {
+    console.log("Fetching current sensor data...");
+    
+    // Mock sensor data
+    const mockSensorData: SensorData[] = [
+      {
+        id: "sensor-1",
+        timestamp: new Date().toISOString(),
+        waterLevel: 2.3 + Math.random(),
+        rainfall: 15 + Math.random() * 5,
+        temperature: 22 + Math.random() * 3,
+        humidity: 65 + Math.random() * 10,
+        soilMoisture: 45 + Math.random() * 15,
+        predictionRisk: "low"
+      },
+      {
+        id: "sensor-2",
+        timestamp: new Date().toISOString(),
+        waterLevel: 4.7 + Math.random(),
+        rainfall: 25 + Math.random() * 5,
+        temperature: 23 + Math.random() * 3,
+        humidity: 70 + Math.random() * 10,
+        soilMoisture: 60 + Math.random() * 15,
+        predictionRisk: "medium"
+      },
+      {
+        id: "sensor-3",
+        timestamp: new Date().toISOString(),
+        waterLevel: 7.2 + Math.random(),
+        rainfall: 45 + Math.random() * 5,
+        temperature: 21 + Math.random() * 3,
+        humidity: 85 + Math.random() * 10,
+        soilMoisture: 75 + Math.random() * 15,
+        predictionRisk: "high"
+      }
+    ];
+    
+    await new Promise(resolve => setTimeout(resolve, 600));
+    
+    return mockSensorData;
+  } catch (error) {
+    console.error("Error fetching current sensor data:", error);
+    return [];
+  }
+};
+
+export const getCurrentWeather = async (): Promise<WeatherData> => {
+  try {
+    console.log("Fetching current weather...");
+    
+    // Mock weather data
+    const mockWeatherData: WeatherData = {
+      location: "San Francisco, CA",
+      temperature: 18 + Math.random() * 8,
+      description: "Partly Cloudy",
+      humidity: 60 + Math.random() * 20,
+      windSpeed: 8 + Math.random() * 7,
+      icon: "clouds",
+      rainfall: 5 + Math.random() * 20
+    };
+    
+    await new Promise(resolve => setTimeout(resolve, 800));
+    
+    return mockWeatherData;
+  } catch (error) {
+    console.error("Error fetching current weather:", error);
+    throw error;
+  }
+};
+
+export const getForecastData = async (): Promise<ForecastData[]> => {
+  try {
+    console.log("Fetching forecast data...");
+    
+    // Mock forecast data for the next 5 days
+    const mockForecastData: ForecastData[] = Array.from({ length: 5 }, (_, i) => {
+      const date = new Date();
+      date.setDate(date.getDate() + i);
+      
+      return {
+        date: date.toISOString(),
+        condition: ["Sunny", "Partly Cloudy", "Cloudy", "Light Rain", "Heavy Rain"][Math.floor(Math.random() * 5)],
+        tempHigh: 20 + Math.floor(Math.random() * 10),
+        tempLow: 12 + Math.floor(Math.random() * 8),
+        precipitation: Math.floor(Math.random() * 100),
+        humidity: 50 + Math.floor(Math.random() * 50)
+      };
+    });
+    
+    await new Promise(resolve => setTimeout(resolve, 700));
+    
+    return mockForecastData;
+  } catch (error) {
+    console.error("Error fetching forecast data:", error);
+    return [];
+  }
+};
+
+export const getHistoricalSensorData = async (days: number = 30): Promise<any[]> => {
+  try {
+    console.log(`Fetching historical sensor data for the past ${days} days...`);
+    
+    // Mock historical data
+    const mockHistoricalData = Array.from({ length: days }, (_, i) => {
+      const date = new Date();
+      date.setDate(date.getDate() - i);
+      
+      return {
+        date: date.toISOString(),
+        waterLevel: Math.random() * 10,
+        rainfall: Math.random() * 50,
+        temperature: 15 + Math.random() * 15,
+        humidity: 40 + Math.random() * 60,
+        soilMoisture: 30 + Math.random() * 70,
+        predictionRisk: ["low", "medium", "high", "critical"][Math.floor(Math.random() * 4)]
+      };
+    });
+    
+    await new Promise(resolve => setTimeout(resolve, 900));
+    
+    return mockHistoricalData;
+  } catch (error) {
+    console.error("Error fetching historical sensor data:", error);
     return [];
   }
 };
