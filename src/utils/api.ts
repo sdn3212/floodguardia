@@ -60,14 +60,75 @@ export const getForecastData = async (location: string = 'New York,US'): Promise
     const data = await response.json();
     
     // Process and transform the data
-    const forecast = data.forecast.slice(0, 3).map((day: any) => ({
-      date: new Date(day.time * 1000).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }),
-      condition: day.description,
-      tempHigh: Math.round(day.temperature_max),
-      tempLow: Math.round(day.temperature_min),
-      precipitation: day.precipitation_amount,
-      humidity: day.relative_humidity_avg
-    }));
+    // Check if data.data_1h exists before trying to access it
+    if (!data.data_1h) {
+      console.error('Unexpected Meteoblue API response format:', data);
+      return generateMockForecastData(3);
+    }
+    
+    // Group data by day to create daily forecasts
+    const dailyData: Record<string, any> = {};
+    
+    // Get the first 3 days of data
+    const uniqueDays = [...new Set(data.data_1h.time.map((time: string) => time.split(' ')[0]))].slice(0, 3);
+    
+    uniqueDays.forEach(day => {
+      const dayData = {
+        temperatures: [] as number[],
+        precipitation: 0,
+        humidity: [] as number[],
+        condition: ''
+      };
+      
+      // Find all data points for this day
+      data.data_1h.time.forEach((time: string, index: number) => {
+        if (time.startsWith(day)) {
+          if (data.data_1h.temperature) {
+            dayData.temperatures.push(data.data_1h.temperature[index]);
+          }
+          
+          if (data.data_1h.precipitation) {
+            dayData.precipitation += data.data_1h.precipitation[index] || 0;
+          }
+          
+          if (data.data_1h.relativehumidity) {
+            dayData.humidity.push(data.data_1h.relativehumidity[index]);
+          }
+        }
+      });
+      
+      // Determine weather condition based on precipitation
+      if (dayData.precipitation > 10) {
+        dayData.condition = 'Heavy Rain';
+      } else if (dayData.precipitation > 5) {
+        dayData.condition = 'Moderate Rain';
+      } else if (dayData.precipitation > 0) {
+        dayData.condition = 'Light Rain';
+      } else {
+        dayData.condition = 'Clear';
+      }
+      
+      dailyData[day] = dayData;
+    });
+    
+    // Convert to ForecastData array
+    const forecast = uniqueDays.map(day => {
+      const dayData = dailyData[day];
+      const tempHigh = Math.max(...dayData.temperatures);
+      const tempLow = Math.min(...dayData.temperatures);
+      const avgHumidity = dayData.humidity.length 
+        ? Math.round(dayData.humidity.reduce((a: number, b: number) => a + b, 0) / dayData.humidity.length) 
+        : 0;
+      
+      return {
+        date: new Date(day).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }),
+        condition: dayData.condition,
+        tempHigh: Math.round(tempHigh),
+        tempLow: Math.round(tempLow),
+        precipitation: Math.round(dayData.precipitation * 10) / 10,
+        humidity: avgHumidity
+      };
+    });
     
     return forecast;
   } catch (error) {
@@ -188,4 +249,34 @@ export const getEvacuationRoutes = async () => {
       isSafe: false
     }
   ];
+};
+
+// Hardware connectivity API functions
+export const connectToHardware = async (ipAddress: string, port: string): Promise<boolean> => {
+  // In a real app, this would establish a connection to the hardware gateway
+  await new Promise(resolve => setTimeout(resolve, 1500));
+  return true;
+};
+
+export const getConnectedDevices = async (): Promise<any[]> => {
+  // In a real app, this would fetch the list of connected devices from the hardware gateway
+  await new Promise(resolve => setTimeout(resolve, 1000));
+  return [
+    { id: "ws001", name: "Water Level Sensor #1", type: "ultrasonic", status: "online", lastReading: "6.2m", battery: 87 },
+    { id: "rf001", name: "Rainfall Sensor #1", type: "tipping bucket", status: "online", lastReading: "15.8mm/h", battery: 92 },
+    { id: "th001", name: "Temperature/Humidity #1", type: "DHT22", status: "online", lastReading: "18.5°C / 37%", battery: 78 },
+    { id: "sm001", name: "Soil Moisture #1", type: "capacitive", status: "online", lastReading: "22.4%", battery: 65 }
+  ];
+};
+
+export const sendCommandToDevice = async (deviceId: string, command: string): Promise<boolean> => {
+  // In a real app, this would send a command to a specific device
+  await new Promise(resolve => setTimeout(resolve, 800));
+  return true;
+};
+
+export const updateFirmware = async (deviceId: string): Promise<boolean> => {
+  // In a real app, this would update the firmware of a specific device
+  await new Promise(resolve => setTimeout(resolve, 3000));
+  return true;
 };

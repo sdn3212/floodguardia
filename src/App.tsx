@@ -9,6 +9,7 @@ import Index from "./pages/Index";
 import Map from "./pages/Map";
 import Historical from "./pages/Historical";
 import Arduino from "./pages/Arduino";
+import Hardware from "./pages/Hardware";
 import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
 
@@ -26,6 +27,7 @@ const App = () => (
             <Route path="/map" element={<Map />} />
             <Route path="/historical" element={<Historical />} />
             <Route path="/arduino" element={<Arduino />} />
+            <Route path="/hardware" element={<Hardware />} />
             <Route path="/settings" element={<Settings />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
