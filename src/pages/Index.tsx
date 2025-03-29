@@ -13,6 +13,7 @@ import SafetyTipsWidget from "@/components/SafetyTipsWidget";
 import ResourcesWidget from "@/components/ResourcesWidget";
 import EvacuationRouteWidget from "@/components/EvacuationRouteWidget";
 import WaterLevelTrendsWidget from "@/components/WaterLevelTrendsWidget";
+import MeteoblueWidget from "@/components/MeteoblueWidget";
 
 const Index = () => {
   useEffect(() => {
@@ -42,9 +43,11 @@ const Index = () => {
           <FloodMap />
           
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <EvacuationRouteWidget />
+            <MeteoblueWidget />
             <WaterLevelTrendsWidget />
           </div>
+          
+          <EvacuationRouteWidget />
         </div>
         
         <div className="md:col-span-4 space-y-6">

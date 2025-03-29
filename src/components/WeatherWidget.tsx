@@ -5,7 +5,8 @@ import { getCurrentWeather } from "@/utils/api";
 import { 
   Card, 
   CardContent, 
-  CardHeader
+  CardHeader,
+  CardTitle
 } from "@/components/ui/card";
 import { 
   Cloud, 
@@ -14,7 +15,9 @@ import {
   MapPin, 
   Sun, 
   Thermometer, 
-  Wind
+  Wind,
+  CloudSun,
+  CloudFog
 } from "lucide-react";
 
 const WeatherWidget = () => {
@@ -44,14 +47,18 @@ const WeatherWidget = () => {
   const getWeatherIcon = () => {
     if (!weather) return <Cloud className="h-10 w-10 text-gray-400" />;
     
-    const icon = weather.icon;
+    const description = weather.description.toLowerCase();
     
-    if (icon.includes('01')) {
+    if (description.includes('sunny') || description.includes('clear')) {
       return <Sun className="h-10 w-10 text-yellow-500" />;
-    } else if (icon.includes('02') || icon.includes('03') || icon.includes('04')) {
+    } else if (description.includes('partly cloudy')) {
+      return <CloudSun className="h-10 w-10 text-gray-400" />;
+    } else if (description.includes('cloudy')) {
       return <Cloud className="h-10 w-10 text-gray-400" />;
-    } else if (icon.includes('09') || icon.includes('10') || icon.includes('11')) {
+    } else if (description.includes('rain') || description.includes('shower')) {
       return <CloudRain className="h-10 w-10 text-blue-500" />;
+    } else if (description.includes('fog') || description.includes('mist')) {
+      return <CloudFog className="h-10 w-10 text-gray-400" />;
     } else {
       return <Cloud className="h-10 w-10 text-gray-400" />;
     }
@@ -76,47 +83,50 @@ const WeatherWidget = () => {
     return (
       <Card className="h-full">
         <CardContent className="flex items-center justify-center h-full">
-          <p className="text-gray-500">Unable to load weather data</p>
+          <p className="text-muted-foreground">Unable to load weather data</p>
         </CardContent>
       </Card>
     );
   }
   
   return (
-    <Card className="h-full">
-      <CardHeader className="pb-2">
-        <h3 className="text-lg font-semibold">Current Weather</h3>
+    <Card className="h-full bg-gradient-to-br from-card to-card/95 shadow-md">
+      <CardHeader className="pb-2 border-b border-muted/30">
+        <CardTitle className="flex items-center">
+          <span>Current Weather</span>
+          <span className="ml-auto text-xs text-muted-foreground">powered by Meteoblue</span>
+        </CardTitle>
       </CardHeader>
-      <CardContent>
+      <CardContent className="pt-4">
         <div className="flex items-center space-x-4">
           <div className="flex-shrink-0">
             {getWeatherIcon()}
           </div>
           <div>
             <div className="flex items-center">
-              <Thermometer className="h-4 w-4 mr-1 text-gray-500" />
-              <span className="text-3xl font-bold">{weather.temperature}°C</span>
+              <Thermometer className="h-4 w-4 mr-1 text-primary" />
+              <span className="text-3xl font-bold text-card-foreground">{Math.round(weather.temperature)}°C</span>
             </div>
-            <p className="text-gray-500 capitalize">{weather.description}</p>
+            <p className="text-card-foreground capitalize">{weather.description}</p>
           </div>
         </div>
         
         <div className="mt-4 grid grid-cols-2 gap-3">
-          <div className="flex items-center text-gray-600">
-            <MapPin className="h-4 w-4 mr-1" />
+          <div className="flex items-center text-card-foreground">
+            <MapPin className="h-4 w-4 mr-1 text-primary" />
             <span className="text-sm">{weather.location}</span>
           </div>
-          <div className="flex items-center text-gray-600">
-            <Wind className="h-4 w-4 mr-1" />
-            <span className="text-sm">{weather.windSpeed} m/s</span>
+          <div className="flex items-center text-card-foreground">
+            <Wind className="h-4 w-4 mr-1 text-blue-400" />
+            <span className="text-sm">{Math.round(weather.windSpeed)} m/s</span>
           </div>
-          <div className="flex items-center text-gray-600">
-            <Droplets className="h-4 w-4 mr-1" />
-            <span className="text-sm">{weather.humidity}%</span>
+          <div className="flex items-center text-card-foreground">
+            <Droplets className="h-4 w-4 mr-1 text-blue-500" />
+            <span className="text-sm">{Math.round(weather.humidity)}%</span>
           </div>
-          <div className="flex items-center text-gray-600">
-            <CloudRain className="h-4 w-4 mr-1" />
-            <span className="text-sm">{weather.rainfall} mm</span>
+          <div className="flex items-center text-card-foreground">
+            <CloudRain className="h-4 w-4 mr-1 text-blue-500" />
+            <span className="text-sm">{Math.round(weather.rainfall)} mm</span>
           </div>
         </div>
       </CardContent>

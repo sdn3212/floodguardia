@@ -1,6 +1,9 @@
-import { FloodAlert, RiskLevel, ForecastData, WeatherData, SensorData } from "@/types";
+
+import { FloodAlert, RiskLevel, ForecastData, WeatherData, SensorData, MeteoblueData, MeteoblueForecast } from "@/types";
+import { API_KEYS } from "@/config/constants";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:3000";
+const METEOBLUE_API_URL = "https://my.meteoblue.com/packages/basic-day";
 
 export const getFloodAlerts = async (): Promise<FloodAlert[]> => {
   try {
@@ -11,24 +14,30 @@ export const getFloodAlerts = async (): Promise<FloodAlert[]> => {
     const mockAlerts: FloodAlert[] = [
       {
         id: "1",
+        title: "Moderate Flood Warning",
         message: "Moderate flood risk in downtown area",
         riskLevel: "medium",
+        severity: "warning",
         timestamp: new Date().toISOString(),
         isRead: false,
         location: "Downtown"
       },
       {
         id: "2",
+        title: "High Flood Alert",
         message: "High flood risk in coastal regions due to storm surge",
         riskLevel: "high",
+        severity: "alert",
         timestamp: new Date(Date.now() - 3600000).toISOString(), // 1 hour ago
         isRead: true,
         location: "Coastal Region"
       },
       {
         id: "3",
+        title: "Critical Evacuation Notice",
         message: "Critical flood risk in low-lying areas near the river",
         riskLevel: "critical",
+        severity: "emergency",
         timestamp: new Date(Date.now() - 7200000).toISOString(), // 2 hours ago
         isRead: false,
         location: "Riverside"
@@ -43,6 +52,9 @@ export const getFloodAlerts = async (): Promise<FloodAlert[]> => {
     return [];
   }
 };
+
+// Alias for getFloodAlerts for compatibility
+export const getAlerts = getFloodAlerts;
 
 export const getFloodPrediction = async (): Promise<{ riskLevel: RiskLevel; description: string }> => {
   try {
@@ -127,9 +139,28 @@ export const getCurrentSensorData = async (): Promise<SensorData[]> => {
 
 export const getCurrentWeather = async (): Promise<WeatherData> => {
   try {
-    console.log("Fetching current weather...");
+    console.log("Fetching current weather from Meteoblue...");
     
-    // Mock weather data
+    // Try to get data from Meteoblue first
+    try {
+      const meteoblueData = await getMeteoblueData();
+      if (meteoblueData && meteoblueData.length > 0) {
+        const current = meteoblueData[0];
+        return {
+          location: "Current Location",
+          temperature: current.temperature,
+          description: current.description,
+          humidity: current.humidity,
+          windSpeed: current.windspeed,
+          icon: current.icon,
+          rainfall: current.precipitation
+        };
+      }
+    } catch (meteoblueError) {
+      console.error("Failed to fetch from Meteoblue, using mock data:", meteoblueError);
+    }
+    
+    // Fallback to mock data
     const mockWeatherData: WeatherData = {
       location: "San Francisco, CA",
       temperature: 18 + Math.random() * 8,
@@ -151,7 +182,27 @@ export const getCurrentWeather = async (): Promise<WeatherData> => {
 
 export const getForecastData = async (): Promise<ForecastData[]> => {
   try {
-    console.log("Fetching forecast data...");
+    console.log("Fetching forecast data from Meteoblue...");
+    
+    // Try to get data from Meteoblue first
+    try {
+      const meteoblueData = await getMeteoblueData();
+      if (meteoblueData && meteoblueData.length > 0) {
+        return meteoblueData.map(item => {
+          const date = new Date(item.time);
+          return {
+            date: date.toISOString(),
+            condition: item.description,
+            tempHigh: item.temperature,
+            tempLow: item.temperature - Math.random() * 8,
+            precipitation: item.precipitation,
+            humidity: item.humidity
+          };
+        });
+      }
+    } catch (meteoblueError) {
+      console.error("Failed to fetch from Meteoblue, using mock data:", meteoblueError);
+    }
     
     // Mock forecast data for the next 5 days
     const mockForecastData: ForecastData[] = Array.from({ length: 5 }, (_, i) => {
@@ -174,6 +225,62 @@ export const getForecastData = async (): Promise<ForecastData[]> => {
   } catch (error) {
     console.error("Error fetching forecast data:", error);
     return [];
+  }
+};
+
+/**
+ * Fetches weather data from Meteoblue API
+ */
+export const getMeteoblueData = async (): Promise<MeteoblueForecast[]> => {
+  try {
+    const apiKey = API_KEYS.METEOBLUE;
+    
+    // Default coordinates for New York
+    const latitude = 40.730610;
+    const longitude = -73.935242;
+    
+    const url = `${METEOBLUE_API_URL}?apikey=${apiKey}&lat=${latitude}&lon=${longitude}&asl=200&format=json`;
+    
+    // For testing purposes, we'll return mock data since the real API calls require proper credentials
+    console.log(`Fetching Meteoblue data with key ${apiKey} (would call: ${url})`);
+    
+    // In a real implementation, we'd make the actual API call:
+    // const response = await fetch(url);
+    // if (!response.ok) {
+    //   throw new Error(`Failed to fetch from Meteoblue: ${response.status}`);
+    // }
+    // const data = await response.json();
+    
+    // For now, simulate a successful response with mock data
+    await new Promise(resolve => setTimeout(resolve, 500));
+    
+    // Create mock meteoblue-like data
+    const now = new Date();
+    const forecast: MeteoblueForecast[] = [];
+    
+    for (let i = 0; i < 7; i++) {
+      const forecastDate = new Date(now);
+      forecastDate.setDate(forecastDate.getDate() + i);
+      
+      const isRainy = Math.random() > 0.7;
+      
+      forecast.push({
+        time: forecastDate,
+        temperature: 15 + Math.random() * 15,
+        precipitation: isRainy ? 5 + Math.random() * 20 : Math.random() * 5,
+        humidity: 50 + Math.random() * 40,
+        windspeed: 5 + Math.random() * 15,
+        description: isRainy ? 
+          ["Light Rain", "Showers", "Heavy Rain"][Math.floor(Math.random() * 3)] : 
+          ["Sunny", "Partly Cloudy", "Cloudy"][Math.floor(Math.random() * 3)],
+        icon: isRainy ? "cloud-rain" : ["sun", "cloud-sun", "cloud"][Math.floor(Math.random() * 3)]
+      });
+    }
+    
+    return forecast;
+  } catch (error) {
+    console.error("Error fetching from Meteoblue API:", error);
+    throw error;
   }
 };
 

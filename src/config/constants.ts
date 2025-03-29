@@ -26,7 +26,7 @@ export const API_KEYS = {
   GEMINI: "AIzaSyDKrdqNEPxy7660KlVTTNOyqp71p9stbzE",
   OPENWEATHERMAP: "22eefce6473b2558318670f52c295b67",
   MAPTILER: "LJwsgPqESAjRNnYh1cjw",
-  METEOBLUE: "1mbHMgZxRuhQDE5n"
+  METEOBLUE: "NGcpaq3HRD4f6SE1"
 };
 
 export const DEFAULT_MAP_LOCATION: [number, number] = [-73.935242, 40.730610]; // NYC
