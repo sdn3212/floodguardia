@@ -17,9 +17,9 @@ const WaterLevelTrendsWidget = () => {
   const currentTrend = trendData[trendData.length - 1].level > trendData[trendData.length - 2].level
     ? { 
         direction: "rising", 
-        icon: <ArrowUp className="h-5 w-5 text-red-500 animate-pulse" />,
-        bgClass: "bg-red-50",
-        textClass: "text-red-700"
+        icon: <ArrowUp className="h-5 w-5 text-blue-900 animate-pulse" />,
+        bgClass: "bg-blue-50",
+        textClass: "text-blue-900"
       }
     : { 
         direction: "falling", 
