@@ -92,6 +92,7 @@ const HistoricalDataChart = () => {
         date: formatDate(item.timestamp),
       }));
   };
+
   const CustomTooltip = ({
     active,
     payload,
@@ -127,9 +128,9 @@ const HistoricalDataChart = () => {
   };
 
   return (
-    <Card className="border-border bg-gradient-to-br from-card to-card/80">
+    <Card className="border-border bg-gradient-to-br from-card to-card/80 shadow-md hover:shadow-lg transition-all duration-300">
       <CardHeader className="flex flex-row items-center justify-between pb-2 border-b border-border/50 space-y-0">
-        <CardTitle className="text-card-foreground text-lg">
+        <CardTitle className="text-card-foreground text-lg font-medium">
           Historical Data
         </CardTitle>
         <Select value={timeRange} onValueChange={setTimeRange}>
@@ -149,64 +150,66 @@ const HistoricalDataChart = () => {
             <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
           </div>
         ) : (
-          <ResponsiveContainer width="100%" height={250}>
-            <LineChart
-              data={prepareChartData()}
-              margin={{ top: 5, right: 20, left: 0, bottom: 5 }}
-            >
-              <CartesianGrid
-                strokeDasharray="3 3"
-                stroke="hsl(var(--border))"
-              />
-              <XAxis
-                dataKey="date"
-                tick={{ fontSize: 12, fill: "hsl(var(--muted-foreground))" }}
-                tickMargin={10}
-                stroke="hsl(var(--muted-foreground))"
-              />
-              <YAxis
-                tick={{ fontSize: 12, fill: "hsl(var(--muted-foreground))" }}
-                tickMargin={10}
-                stroke="hsl(var(--muted-foreground))"
-              />
-              <Tooltip content={<CustomTooltip />} />
-              <Legend
-                verticalAlign="top"
-                height={40}
-                wrapperStyle={{ paddingTop: "15px" }}
-                formatter={(value) => (
-                  <span className="text-card-foreground">{value}</span>
-                )}
-              />
-              <Line
-                type="monotone"
-                dataKey="waterLevel"
-                name="Water Level (m)"
-                stroke="#60a5fa"
-                activeDot={{ r: 6 }}
-                dot={{ r: 3 }}
-                strokeWidth={2}
-              />
-              <Line
-                type="monotone"
-                dataKey="rainfall"
-                name="Rainfall (mm/h)"
-                stroke="#a5b4fc"
-                activeDot={{ r: 6 }}
-                dot={{ r: 3 }}
-                strokeWidth={2}
-              />
-              <Line
-                type="monotone"
-                dataKey="soilMoisture"
-                name="Soil Moisture (%)"
-                stroke="#6ee7b7"
-                activeDot={{ r: 6 }}
-                dot={{ r: 3 }}
-                strokeWidth={2}
-              />
-            </LineChart>
-          </ResponsiveContainer>
+          <div className="w-full" style={{ height: "250px", maxWidth: "100%" }}>
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart
+                data={prepareChartData()}
+                margin={{ top: 5, right: 20, left: 0, bottom: 5 }}
+              >
+                <CartesianGrid
+                  strokeDasharray="3 3"
+                  stroke="hsl(var(--border))"
+                />
+                <XAxis
+                  dataKey="date"
+                  tick={{ fontSize: 12, fill: "hsl(var(--muted-foreground))" }}
+                  tickMargin={10}
+                  stroke="hsl(var(--muted-foreground))"
+                />
+                <YAxis
+                  tick={{ fontSize: 12, fill: "hsl(var(--muted-foreground))" }}
+                  tickMargin={10}
+                  stroke="hsl(var(--muted-foreground))"
+                />
+                <Tooltip content={<CustomTooltip />} />
+                <Legend
+                  verticalAlign="top"
+                  height={40}
+                  wrapperStyle={{ paddingTop: "15px" }}
+                  formatter={(value) => (
+                    <span className="text-card-foreground">{value}</span>
+                  )}
+                />
+                <Line
+                  type="monotone"
+                  dataKey="waterLevel"
+                  name="Water Level (m)"
+                  stroke="#60a5fa"
+                  activeDot={{ r: 6 }}
+                  dot={{ r: 3 }}
+                  strokeWidth={2}
+                />
+                <Line
+                  type="monotone"
+                  dataKey="rainfall"
+                  name="Rainfall (mm/h)"
+                  stroke="#a5b4fc"
+                  activeDot={{ r: 6 }}
+                  dot={{ r: 3 }}
+                  strokeWidth={2}
+                />
+                <Line
+                  type="monotone"
+                  dataKey="soilMoisture"
+                  name="Soil Moisture (%)"
+                  stroke="#6ee7b7"
+                  activeDot={{ r: 6 }}
+                  dot={{ r: 3 }}
+                  strokeWidth={2}
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
         )}
       </CardContent>
     </Card>
