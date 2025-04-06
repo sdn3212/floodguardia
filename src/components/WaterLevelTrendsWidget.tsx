@@ -15,8 +15,18 @@ const WaterLevelTrendsWidget = () => {
   ];
 
   const currentTrend = trendData[trendData.length - 1].level > trendData[trendData.length - 2].level
-    ? { direction: "rising", icon: <ArrowUp className="h-4 w-4 text-red-500" /> }
-    : { direction: "falling", icon: <ArrowDown className="h-4 w-4 text-green-500" /> };
+    ? { 
+        direction: "rising", 
+        icon: <ArrowUp className="h-5 w-5 text-red-500 animate-pulse" />,
+        bgClass: "bg-red-50",
+        textClass: "text-red-700"
+      }
+    : { 
+        direction: "falling", 
+        icon: <ArrowDown className="h-5 w-5 text-green-500 animate-pulse" />,
+        bgClass: "bg-green-50",
+        textClass: "text-green-700"
+      };
 
   const CustomTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
@@ -45,11 +55,9 @@ const WaterLevelTrendsWidget = () => {
             <span className="text-sm text-gray-500">Current</span>
             <div className="text-xl font-bold">{trendData[trendData.length - 1].level}m</div>
           </div>
-          <div className="flex items-center gap-1 px-3 py-1 bg-gray-100 rounded-full">
-            <span className="text-sm">
-              {currentTrend.icon}
-            </span>
-            <span className="text-sm capitalize">
+          <div className={`flex items-center gap-2 px-3 py-1 ${currentTrend.bgClass} rounded-full`}>
+            <span>{currentTrend.icon}</span>
+            <span className={`text-sm font-medium ${currentTrend.textClass} capitalize`}>
               {currentTrend.direction}
             </span>
           </div>
